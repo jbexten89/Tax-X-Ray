@@ -103,6 +103,7 @@ input[type=checkbox][role=switch]:checked{background:var(--mint)}
 input[type=checkbox][role=switch]:checked::after{transform:translateX(20px)}
 .btn{min-height:48px;border-radius:12px;border:1px solid var(--border2);background:var(--panel2);color:var(--text);font:inherit;font-weight:700;font-size:15px;padding:0 16px;cursor:pointer;white-space:nowrap}
 label.btn{display:inline-flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none}
+.card.gate-off .gate{display:none}
 .vh{position:absolute!important;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0);pointer-events:none}
 .errd{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);background:var(--field);border:1px solid var(--border);border-radius:10px;padding:8px 10px;margin:8px 0;word-break:break-word}
 .btn.primary{background:var(--mint);border-color:var(--mint);color:#06110C}
@@ -255,6 +256,7 @@ pre.raw{white-space:pre-wrap;word-break:break-word;font-size:12px;color:var(--mu
     </div>
   </div>
   <input type="file" id="stubFile" accept="image/*" class="vh" tabindex="-1" aria-hidden="true">
+  <input type="file" id="bonusFile" accept="image/*" class="vh" tabindex="-1" aria-hidden="true">
 
   <footer>
     Tax X-Ray is an estimate, not tax advice. It simplifies several rules (see the X-ray notes) and uses the figures in its built-in tax tables, which you should confirm before acting. Your numbers never leave this device.
@@ -370,6 +372,16 @@ const CARDS = [
     [["w2_swh_ytd","Ohio YTD","money"],["w2_swh_check","Ohio per check","money"]],
     [["w2_lwh_ytd","Local YTD (city + school)","money"],["w2_lwh_check","Local per check","money"]]
   ]},
+  { id:"bonus", title:"Upcoming bonus", sub:"Off — a bonus counts once it's on a paystub", gate:"bonus_on", fields:[
+    ["bonus_on","Include an upcoming bonus","toggle"],
+    {note:"Use this for a bonus you haven't been paid yet. After it's paid, its amounts are in your paystub's YTD — turn this off then so it isn't counted twice."},
+    {html:`<div class="scanbox"><div class="t">Fill from a bonus statement</div><div class="note" style="margin-top:4px">A screenshot or photo of the bonus preview — read on this phone, then you confirm each number.</div><div class="btns"><label class="btn primary" for="bonusFile" role="button">Scan photo</label><button class="btn" type="button" data-act="bonuspaste">Paste text</button></div></div>`},
+    ["bonus_gross","Bonus (gross)","money"],
+    [["bonus_401k","401(k) from bonus","money"],["bonus_pre","Other pre-tax from bonus","money"]],
+    {sub:"Withholding on the bonus"},
+    [["bonus_fwh","Federal","money"],["bonus_swh","Ohio","money"]],
+    ["bonus_lwh","Local (city + school)","money"]
+  ]},
   { id:"biz", title:"Photography business", sub:"Schedule C — sole proprietor", fields:[
     [["biz_rcpt_ytd","Gross receipts YTD","money"],["biz_rcpt_rest","Expected receipts, rest of year","money"]],
     [["biz_exp_ytd","Expenses YTD (simple total)","money"],["biz_exp_rest","Expected expenses, rest of year","money"]],
@@ -453,15 +465,17 @@ function compute(St, o){
   const proj = (a, b) => n(St[a]) + n(St[b]) * P;
 
   // ---- W-2 projection ----
-  const gross = proj("w2_gross_ytd","w2_gross_check") + (o.bumpWages || 0);
-  const k401 = proj("w2_401k_ytd","w2_401k_check") + wi.k;
-  const pre = proj("w2_pre_ytd","w2_pre_check");
+  // upcoming bonus (only while switched on) — a one-time check on top of the regular paychecks
+  const bon = St.bonus_on ? { g:n(St.bonus_gross), k:n(St.bonus_401k), p:n(St.bonus_pre), f:n(St.bonus_fwh), s:n(St.bonus_swh), l:n(St.bonus_lwh) } : { g:0, k:0, p:0, f:0, s:0, l:0 };
+  const gross = proj("w2_gross_ytd","w2_gross_check") + bon.g + (o.bumpWages || 0);
+  const k401 = proj("w2_401k_ytd","w2_401k_check") + bon.k + wi.k;
+  const pre = proj("w2_pre_ytd","w2_pre_check") + bon.p;
   const box1 = Math.max(0, gross - k401 - pre);          // federal & Ohio wages
   const medWages = Math.max(0, gross - pre);             // FICA / city wages (401k still included)
   const ssWages = Math.min(medWages, F.ssWageBase);
-  const fedWH = proj("w2_fwh_ytd","w2_fwh_check");
-  const ohWH = proj("w2_swh_ytd","w2_swh_check");
-  const locWH = proj("w2_lwh_ytd","w2_lwh_check");
+  const fedWH = proj("w2_fwh_ytd","w2_fwh_check") + bon.f;
+  const ohWH = proj("w2_swh_ytd","w2_swh_check") + bon.s;
+  const locWH = proj("w2_lwh_ytd","w2_lwh_check") + bon.l;
 
   // ---- Schedule C ----
   const rcpt = n(St.biz_rcpt_ytd) + n(St.biz_rcpt_rest) + wi.bi + (o.bumpBiz || 0);
@@ -567,7 +581,7 @@ function compute(St, o){
   const total = fedTotal + ohTax + localTax;
   const income = Math.max(0, gross + net + intDiv + oth);
   return {
-    P, gross, k401, pre, box1, medWages, fedWH, ohWH, locWH, addlWH,
+    P, gross, bonus: bon.g, bonusWH: bon.f + bon.s + bon.l, k401, pre, box1, medWages, fedWH, ohWH, locWH, addlWH,
     rcpt, exp, expYtd, mileage, useCats, net, seBase, seSS, seMed, seTax, halfSE, addlMed,
     agi, magi, std, itemized, saltClaimed, saltCap, saltDed, charityItem, charityStd, useItem, deduction, otDed, carDed,
     tiPre, qbi, qbiDed, qbiNote, taxable, incTax, credit, fedIncTax, fedTotal, fedEst, fedPaid,
@@ -601,13 +615,15 @@ function buildInputs(){
   const F = T().federal;
   const mileNote = `Miles × IRS rate: ${(F.mileage.h1*100).toFixed(1)}¢ Jan–Jun, ${(F.mileage.h2*100).toFixed(1)}¢ Jul–Dec.`;
   $("cards").innerHTML = CARDS.map(c => {
-    const body = c.fields.map(f => {
+    const parts = c.fields.map(f => {
       if (!Array.isArray(f) && f.html) return f.html;
       if (!Array.isArray(f)) return f.note ? `<p class="note">${f.note === "__MILEAGE_NOTE__" ? mileNote : f.note}</p>` : `<h4 class="subhead">${f.sub}</h4>`;
       if (Array.isArray(f[0])) return `<div class="row2">${f.map(fieldHTML).join("")}</div>`;
       return fieldHTML(f);
-    }).join("");
-    return `<details class="card" id="card-${c.id}"${c.open ? " open" : ""}><summary><span><span class="ct">${c.title}</span><span class="cs" id="der-${c.id}">${c.sub}</span></span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary><div class="card-body">${body}</div></details>`;
+    });
+    // gated cards: the first field is the on/off switch; everything after it hides while off
+    const body = c.gate ? parts[0] + `<div class="gate">${parts.slice(1).join("")}</div>` : parts.join("");
+    return `<details class="card${c.gate && !S[c.gate] ? " gate-off" : ""}" id="card-${c.id}"${c.open ? " open" : ""}><summary><span><span class="ct">${c.title}</span><span class="cs" id="der-${c.id}">${c.sub}</span></span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary><div class="card-body">${body}</div></details>`;
   }).join("");
   $("year").innerHTML = Object.keys(TAX_TABLES).map(y => `<option value="${y}" ${S.year === y ? "selected" : ""}>${esc(TAX_TABLES[y].label || y)}</option>`).join("");
   $("status").innerHTML = STATUSES.map(([v,t]) => `<option value="${v}" ${S.status === v ? "selected" : ""}>${t}</option>`).join("");
@@ -631,6 +647,8 @@ function render(){
   // card subtitles
   const set = (id, txt) => { const el = $("der-" + id); if (el) el.textContent = txt; };
   const c = CARDS.reduce((m, x) => (m[x.id] = x.sub, m), {});
+  const bc = $("card-bonus"); if (bc) bc.classList.toggle("gate-off", !S.bonus_on);
+  set("bonus", S.bonus_on ? (r.bonus ? `On · ${money(r.bonus)} bonus · ${money(r.bonusWH)} withheld` : "On · enter or scan the bonus") : c.bonus);
   set("w2", r.gross > 0 ? `Full year ${money(r.gross)} · taxable ${money(r.box1)} · fed WH ${money(r.fedWH)}` : c.w2);
   set("biz", r.rcpt || r.exp ? `Net profit ${money(r.net)}${r.useCats ? " · using categories" : ""}${r.mileage ? " · mileage " + money(r.mileage) : ""}` : c.biz);
   set("ded", `${r.useItem ? "Itemizing" : "Standard"} · itemized ${money(r.itemized)} vs standard ${money(r.std)}`);
@@ -699,6 +717,7 @@ function render(){
   const L = [];
   L.push(line("Gross W-2 wages (projected)", money(r.gross), "h"));
   L.push(line(`<span class="muted">Paychecks left × per-check</span>`, String(r.P)));
+  if (r.bonus) L.push(line(`<span class="muted">Includes upcoming bonus</span>`, money(r.bonus)));
   L.push(line("− 401(k) and pre-tax", money(r.k401 + r.pre)));
   L.push(line("Federal wages (Box 1)", money(r.box1)));
   L.push(line("Business receipts", money(r.rcpt), "h"));
@@ -1059,7 +1078,7 @@ function countPaychecks(nextStr, year){
   return c;
 }
 
-let SCAN = { parsed:null, raw:"", thumb:"" };
+let SCAN = { parsed:null, raw:"", thumb:"", rows:null, mode:"stub" };
 let tessP = null;
 function loadTesseract(){
   if (window.Tesseract) return Promise.resolve(window.Tesseract);
@@ -1122,6 +1141,9 @@ function prepImage(file, opt){
         const sc = document.createElement("canvas"); sc.width = sw; sc.height = sh;
         const sx = sc.getContext("2d"); sx.drawImage(img, 0, 0, sw, sh);
         let sg = toGray(sx.getImageData(0, 0, sw, sh).data, sw*sh);
+        let mean = 0; for (let i = 0; i < sg.length; i++) mean += sg[i]; mean /= sg.length;
+        const dark = mean < 100;   // dark-mode screenshot: flip to dark text on light
+        if (dark) for (let i = 0; i < sg.length; i++) sg[i] = 255 - sg[i];
         sg = boxBlur(boxBlur(sg, sw, sh, 1), sw, sh, 1);
         const angle = estimateSkew(adaptive(sg, sw, sh, 31, 10), sw, sh);
         // 2) full-size working copy: upscale to ~3200px long side and rotate level
@@ -1129,11 +1151,12 @@ function prepImage(file, opt){
         const w = Math.round(w0*scale), h = Math.round(h0*scale);
         const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
         const cx = cv.getContext("2d");
-        cx.fillStyle = "#fff"; cx.fillRect(0, 0, w, h);
+        cx.fillStyle = dark ? "#000" : "#fff"; cx.fillRect(0, 0, w, h);
         cx.imageSmoothingQuality = "high";
         cx.translate(w/2, h/2); cx.rotate(-angle * Math.PI / 180); cx.drawImage(img, -w/2, -h/2, w, h); cx.setTransform(1, 0, 0, 1, 0, 0);
         const id = cx.getImageData(0, 0, w, h);
         let g = toGray(id.data, w*h);
+        if (dark) for (let i = 0; i < g.length; i++) g[i] = 255 - g[i];
         // 3) de-moiré blur (≈ gaussian via 3 box passes), 4) local threshold
         const r = Math.max(1, Math.round(scale * opt.blur));
         g = boxBlur(boxBlur(boxBlur(g, w, h, r), w, h, r), w, h, r);
@@ -1164,11 +1187,11 @@ function progressHTML(msg, p){
 }
 function setProgress(msg, p){ const i = document.querySelector("#scanBody .prog i"); if (i) i.style.width = Math.round((p||0)*100) + "%"; const m = $("scanMsg"); if (m) m.textContent = msg; }
 const pasteHint = `On iPhone: open the paystub photo or PDF, press and hold on the text, tap <b>Select All</b>, then <b>Copy</b> and paste here. Nothing is downloaded this way.`;
-function pasteHTML(prefill, warn){
+function pasteHTML(prefill, warn, mode){
   return `${warn ? `<div class="banner warn" style="margin-top:4px">${warn}</div>` : ""}
     <p class="note">${pasteHint}</p>
     <textarea id="stubText" placeholder="Paste paystub text…" spellcheck="false" autocapitalize="off">${esc(prefill || "")}</textarea>
-    <div class="btns"><button class="btn primary full" type="button" data-act="scanread">Read numbers</button></div>`;
+    <div class="btns"><button class="btn primary full" type="button" data-act="${mode === "bonus" ? "bonusread" : "scanread"}">Read numbers</button></div>`;
 }
 function withTimeout(p, ms, what){
   return Promise.race([p, new Promise((_, bad) => setTimeout(() => bad(new Error(what + " timed out after " + Math.round(ms/1000) + "s")), ms))]);
@@ -1180,11 +1203,11 @@ function failHTML(title, stage, err){
     : "Check that you're online for the first scan (the reader downloads once, then works offline), and try again. If it keeps failing, Paste text below always works.";
   return `<div class="banner warn" style="margin-top:4px">${esc(title)}<span class="sm">${why}</span></div>
     <div class="errd">Step: ${esc(stage)}<br>Detail: ${esc(err && (err.message || err) || "unknown")}<br>Page: ${esc(location.protocol)} · ${esc(navigator.userAgent.replace(/^Mozilla\/5\.0 /, "").slice(0, 120))}</div>
-    <div class="btns"><label class="btn primary full" for="stubFile" role="button">Try another photo</label></div>
-    <h4 class="subhead">Or paste the text</h4>` + pasteHTML("", "");
+    <div class="btns"><label class="btn primary full" for="${SCAN.mode === "bonus" ? "bonusFile" : "stubFile"}" role="button">Try another photo</label></div>
+    <h4 class="subhead">Or paste the text</h4>` + pasteHTML("", "", SCAN.mode);
 }
-async function runOCR(file){
-  SCAN = { parsed:null, raw:"", thumb:"", rows:null };
+async function runOCR(file, mode){
+  SCAN = { parsed:null, raw:"", thumb:"", rows:null, mode: mode || "stub" };
   openSheet(progressHTML("Preparing photo…", .02));
   let prepped, stage = "opening the photo";
   try { prepped = await withTimeout(prepImage(file), 30000, "Opening the photo"); }
@@ -1204,6 +1227,17 @@ async function runOCR(file){
       },
       errorHandler: () => {}
     }), 120000, "Starting the reader");
+    if (SCAN.mode === "bonus"){
+      // bonus statement: one label + one amount per line → a single sparse read, rebuilt into lines
+      stage = "reading the text";
+      setProgress("Reading the statement…", .4);
+      await worker.setParameters({ preserve_interword_spaces: "1", tessedit_pageseg_mode: "11" });
+      const ob = await withTimeout(worker.recognize(prepped.gray, {}, { text:true, blocks:true }), 150000, "Reading the text");
+      SCAN.raw = wordsToText(blockWords(ob && ob.data && ob.data.blocks)) || (ob && ob.data && ob.data.text) || "";
+      try { await worker.terminate(); } catch(_){}
+      if (!SCAN.raw.trim()){ openSheet(failHTML("No text found in that photo", "reading the text", "OCR returned no text")); return; }
+      showBonusReview(SCAN.raw); return;
+    }
     // pass 1: whole page, sparse mode, black/white → finds every number and the table's columns
     stage = "reading the text";
     setProgress("Reading the page (1 of 3)…", .4);
@@ -1307,6 +1341,65 @@ function toast(msg){
   const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t);
   setTimeout(() => t.remove(), 2800);
 }
+/* ---------- bonus statement ---------- */
+const BONUS_FIELDS = [
+  ["gross", "Bonus (gross)", "bonus_gross"],
+  ["k401",  "401(k) from bonus", "bonus_401k"],
+  ["pre",   "Other pre-tax (health, HSA…)", "bonus_pre"],
+  ["fwh",   "Federal withholding", "bonus_fwh"],
+  ["swh",   "Ohio withholding", "bonus_swh"],
+  ["lwh",   "Local withholding (city + school)", "bonus_lwh"]
+];
+function parseBonus(text){
+  const rows = textToRows(text);
+  const R = extractFields(rows, text);
+  // the bonus itself: the largest amount on a bonus/earnings line (not a "% × bonus" basis line)
+  const g = rows.filter(r => r.cur != null && /\bbonus|incentive|award|commission|\bgross|earnings|supplemental/i.test(r.label)
+                          && !/%|×|\bx\b|\bnet\b|401|roth|w\s*\/?\s*h|\btax|fica|deduct/i.test(r.label))
+                .sort((a,b) => b.cur - a.cur)[0];
+  R.gross = g ? { cur:g.cur, ytd:null, lines:[g.src] } : null;
+  return R;
+}
+function showBonusReview(text){
+  SCAN.raw = text;
+  const P = parseBonus(text); SCAN.parsed = P;
+  const found = BONUS_FIELDS.filter(([k]) => P[k] && P[k].cur != null).length;
+  const total = BONUS_FIELDS.length - (P.pre && P.pre.cur != null ? 0 : 1);   // other pre-tax is often absent
+  const v = x => x == null ? "" : (Math.round(x * 100) / 100).toFixed(2);
+  const rows = BONUS_FIELDS.map(([k, label]) => {
+    const r = P[k], has = r && r.cur != null;
+    const optional = k === "pre";
+    return `<div class="rv${has ? "" : " off"}" data-rv="${k}">
+      <div class="rv-hd"><label><input type="checkbox" data-use="${k}" ${has ? "checked" : ""}><span>${label}</span></label>${has ? "" : `<span class="miss" style="${optional ? "color:var(--muted)" : ""}">${optional ? "none on statement" : "not found"}</span>`}</div>
+      <label class="field" style="margin:8px 0 0"><span class="inp has-pre"><span class="affix">$</span><input type="text" inputmode="decimal" data-sv="${k}:cur" value="${v(has ? r.cur : null)}" placeholder="0.00"></span></label>
+      ${has ? `<div class="src">${r.lines.map(esc).join("<br>")}</div>` : ""}
+    </div>`;
+  }).join("");
+  openSheet(`
+    ${SCAN.thumb ? `<img class="thumb" src="${SCAN.thumb}" alt="Bonus statement">` : ""}
+    <div class="${found >= 4 ? "banner ok" : "banner warn"}" style="margin-top:12px">${found} of ${total} lines found<span class="sm">${found >= 4 ? "Check each number against the statement, then apply." : "Fill in what's missing from the statement, or try a screenshot instead of a photo."}</span></div>
+    ${rows}
+    <p class="note">Social Security and Medicare on the bonus aren't needed here. Applying turns on “Include an upcoming bonus”.</p>
+    <div class="btns">
+      <button class="btn primary full" type="button" data-act="bonusapply">Apply bonus</button>
+      <label class="btn" for="bonusFile" role="button">Retake photo</label>
+      <button class="btn" type="button" data-act="bonuspaste">Edit text</button>
+    </div>
+    <details style="margin-top:14px"><summary class="note" style="cursor:pointer">Show what was read (${P.lineCount} lines)</summary><pre class="raw">${esc(P.rowsText)}</pre></details>`);
+}
+function applyBonus(){
+  const body = $("scanBody"); let applied = 0;
+  BONUS_FIELDS.forEach(([k, , key]) => {
+    const use = body.querySelector(`[data-use="${k}"]`), el = body.querySelector(`[data-sv="${k}:cur"]`);
+    if (!use || !use.checked || !el || el.value.trim() === "") return;
+    S[key] = String(n(el.value)); applied++;
+  });
+  S.bonus_on = true;
+  save(); buildInputs(); render(); closeSheet();
+  const card = $("card-bonus"); if (card){ card.open = true; card.scrollIntoView({ block:"start", behavior:"smooth" }); }
+  toast(`Bonus added · ${applied} number${applied === 1 ? "" : "s"}`);
+}
+$("bonusFile").addEventListener("change", e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (f) runOCR(f, "bonus"); });
 $("stubFile").addEventListener("change", e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (f) runOCR(f); });
 $("scanSheet").addEventListener("click", e => { if (e.target === $("scanSheet")) closeSheet(); });
 $("scanSheet").addEventListener("input", e => {
@@ -1348,9 +1441,17 @@ document.addEventListener("click", e => {
   } else if (act === "scanphoto"){
     $("stubFile").click();
   } else if (act === "scanpaste"){
-    openSheet(pasteHTML(SCAN.raw));
+    if (SCAN.mode === "bonus") SCAN = { parsed:null, raw:"", thumb:"", rows:null, mode:"stub" };
+    openSheet(pasteHTML(SCAN.raw, "", "stub"));
   } else if (act === "scanread"){
-    const t = $("stubText"); if (t && t.value.trim()) { SCAN.thumb = ""; SCAN.rows = null; showReview(t.value, null); }
+    const t = $("stubText"); if (t && t.value.trim()) { SCAN.thumb = ""; SCAN.rows = null; SCAN.mode = "stub"; showReview(t.value, null); }
+  } else if (act === "bonuspaste"){
+    if (SCAN.mode !== "bonus") SCAN = { parsed:null, raw:"", thumb:"", rows:null, mode:"bonus" };
+    openSheet(pasteHTML(SCAN.raw, "", "bonus"));
+  } else if (act === "bonusread"){
+    const t = $("stubText"); if (t && t.value.trim()) { SCAN.thumb = ""; SCAN.mode = "bonus"; showBonusReview(t.value); }
+  } else if (act === "bonusapply"){
+    applyBonus();
   } else if (act === "scanapply"){
     applyScan();
   } else if (act === "scanclose"){
@@ -1390,7 +1491,7 @@ $("importFile").addEventListener("change", e => {
 /* ---------- start ---------- */
 load(); buildInputs(); render();
 showTab(compute(S).hasData ? "summary" : "inputs");
-window.__taxxray = { compute, parseStub, TAX_TABLES };
+window.__taxxray = { compute, parseStub, parseBonus, TAX_TABLES };
 })();
 </script>
 </body>
