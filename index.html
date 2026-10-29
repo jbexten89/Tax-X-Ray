@@ -820,64 +820,212 @@ const OCR = {
   core: "https://cdn.jsdelivr.net/npm/tesseract.js-core@7.0.0",
   lang: "https://cdn.jsdelivr.net/npm/@tesseract.js-data/eng@1.0.0/4.0.0_best_int"
 };
-// Each paystub row we look for. `inc` must match the line, `exc` must not.
-// sum:true adds every matching line (e.g. two 401(k) lines, city + school).
+// Each paystub field we look for. Rows are matched on their LABEL text only
+// (numbers removed): `inc` must match, `exc` must not. sum:true adds every
+// matching row. Rows inside employer-paid "Memo"/"Employer" sections are ignored.
 const STUB_FIELDS = [
-  { key:"gross", label:"Gross pay",          cur:"w2_gross_check", ytd:"w2_gross_ytd",
-    inc:/\bgross\b/i, exc:/\bnet\b|federal taxable|fed taxable|taxable wages/i },
+  { key:"gross", label:"Gross pay (incl. taxable benefits)", cur:"w2_gross_check", ytd:"w2_gross_ytd" },
   { key:"fwh",   label:"Federal withholding", cur:"w2_fwh_check",   ytd:"w2_fwh_ytd",
-    inc:/\bfed(?:eral)?\.?\s*(?:inc(?:ome)?\.?\s*)?(?:tax|w\/?h|withh?olding|wh|fit)\b|\bfitw?\b|\bfwt\b|\bfed\s*w\/?h\b/i,
-    exc:/medicare|social|oasdi|fica|\bmed\b|state|taxable|gross/i },
+    inc:/\bfed(?:eral)?\.?\s*(?:inc(?:ome)?\.?\s*)?(?:tax|w\s*\/?\s*[hm]|withh?olding|wh|fit)\b|\bfitw?\b|\bfwt\b/i,
+    exc:/medicare|social|oasdi|fica|\bmed\b|\bsoc\b|state|taxable|gross|extra|2c|filing/i },
   { key:"swh",   label:"Ohio withholding",    cur:"w2_swh_check",   ytd:"w2_swh_ytd",
-    inc:/\bohio\b|\boh\b|\bstate\b|\bsitw?\b|\bswt\b/i,
-    exc:/school|\bsd\b|sdit|city|local|muni|federal|\bfed\b|medicare|social|oasdi|taxable|gross|unemploy|\bsui\b|disab/i },
+    inc:/\bohio\b|\boh\b|\boh\s*w|\bohw|\bstate\b|\bsitw?\b|\bswt\b/i,
+    exc:/school|schl|\bsd\b|sdit|city|local|muni|federal|\bfed\b|medicare|social|oasdi|fica|taxable|gross|unemploy|\bsui\b|disab|filing|exempt/i },
   { key:"lwh",   label:"Local withholding (city + school)", cur:"w2_lwh_check", ytd:"w2_lwh_ytd", sum:true,
-    inc:/\bcity\b|\blocal\b|\bmuni|\bschool\b|\bsd\b|sdit|montpelier|bryan|\brita\b|\bcca\b|\blit\b/i,
-    exc:/gross|\bnet\b|taxable/i },
+    inc:/\bcity\b|\blocal\b|\bmuni|school|sch[li1|]|\bsch\b|\bsd\b|sdit|\brita\b|\bcca\b/i,
+    exc:/gross|\bnet\b|taxable|filing|address/i },
   { key:"k401",  label:"401(k) deferral",     cur:"w2_401k_check",  ytd:"w2_401k_ytd", sum:true,
-    inc:/401\s*\(?\s*k/i, exc:/roth|match|employer|\ber\b|co\.?\s*contr|loan|after[-\s]?tax/i },
-  { key:"pre",   label:"Other pre-tax (health, dental, HSA…)", cur:"w2_pre_check", ytd:"w2_pre_ytd", sum:true,
+    inc:/40[1l]\s*\(?\s*k/i, exc:/roth|ma[tr]?ch|employer|\ber\b|pension|safe|harbor|co\.?\s*contr|loan|after[-\s]?tax/i },
+  { key:"pre",   label:"Other pre-tax (health, dental, vision, HSA…)", cur:"w2_pre_check", ytd:"w2_pre_ytd", sum:true,
     inc:/medical|dental|vision|health|\bmed\b|\bhsa\b|\bfsa\b|sec(?:tion)?\s*125|cafeteria|\bdep(?:endent)?\s*care/i,
-    exc:/medicare|employer|\ber\b|imputed|taxable|life|disab|\bstd\b|\bltd\b|gross|\bnet\b|after[-\s]?tax/i }
+    exc:/medicare|fica|employer|\ber\b|imputed|taxable|life|disab|\bstd\b|\bltd\b|gross|\bnet\b|after[-\s]?tax|cost/i }
 ];
+// Section headers on a statement. Rows under memo/employer sections are employer-paid → ignored.
+const SECTION_RE = /^\W*(e?arnings|t?axable\s*benef\w*|imputed\s*income|m?emo(?:\s*info\w*)?|i?nformation|employer\s*(?:paid|contrib\w*|benefits?)|(?:pre[-\s]?)?tax\s*deduct\w*|post[-\s]?tax\s*deduct\w*|after[-\s]?tax\s*deduct\w*|deductions|t?axes|net\s*pay)\b/i;
+function sectionOf(label){
+  const m = SECTION_RE.exec(label); if (!m) return null;
+  const s = m[1].toLowerCase();
+  if (/^e?arn/.test(s)) return "earnings";
+  if (/^t?axable|imputed/.test(s)) return "benefits";
+  if (/memo|^emo|^i?nform|employer/.test(s)) return "memo";
+  if (/^pre|^tax\s*ded/.test(s)) return "pretax";
+  if (/post|after/.test(s)) return "posttax";
+  if (/^t?axes/.test(s)) return "taxes";
+  if (/net/.test(s)) return "net";
+  return "deductions";
+}
 
+/* --- money token → number (handles OCR "3.600.00", "1, 540.22", "$1223.91") --- */
+function moneyVal(tok){
+  const dol = /\$/.test(tok);
+  let t = String(tok).replace(/[$()~|'"“”‘’]/g, "").replace(/\s+/g, "").replace(/^[-–]/, "").replace(/[,.]$/, "");
+  if (!/^\d[\d.,]*[.,]\d{2}$/.test(t)){
+    // "$2.87425" / "$1206": a dollar amount whose decimal point was lost — cents are always printed, so digits ÷ 100
+    if (dol && /^\d[\d.,]*$/.test(t)){ const d = t.replace(/[.,]/g, ""); if (d.length >= 3) return parseInt(d, 10) / 100; }
+    return null;
+  }
+  const dec = t.slice(-2), head = t.slice(0, -3);
+  // thousands groups must be exactly 3 digits ("1,259.30" ok; "1.2359.30" / "1.01.71" are misreads → blank, not wrong)
+  if (/[.,]/.test(head) && !/^\d{1,3}(?:[.,]\d{3})+$/.test(head)) return null;
+  const whole = head.replace(/[.,]/g, "");
+  if (!/^\d+$/.test(whole)) return null;
+  return parseFloat(whole + "." + dec);
+}
 function stubNumbers(line){
   let s = line
-    .replace(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/g, " ")      // dates
-    .replace(/\b\d+(?:\.\d+)?\s*%/g, " ")                         // percentages
-    .replace(/(\d)\s*,\s*(\d{3})/g, "$1,$2")                       // "3, 600.00" → "3,600.00"
-    .replace(/\b(\d{1,3}(?:\.\d{3})+)\.(\d{2})\b/g, (m, a, b) => a.replace(/\./g, "") + "." + b) // "3.600.00"
-    .replace(/(\d)\s+\.(\d{2})\b/g, "$1.$2");                     // "3600 .00"
-  const out = [];
-  const re = /(\(?-?\$?\s?)(\d{1,3}(?:,\d{3})+(?:\.\d{2})?|\d+\.\d{2})(\)?)/g;
-  let m; while ((m = re.exec(s))) out.push(parseFloat(m[2].replace(/,/g, "")));
+    .replace(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/g, " ")
+    .replace(/\b\d+(?:\.\d+)?\s*%/g, " ")
+    .replace(/(\d)\s*,\s*(\d{3})/g, "$1,$2")
+    .replace(/(\d)\s+\.(\d{2})\b/g, "$1.$2");
+  const all = [], dollars = [];
+  const re = /(\$\s?)?(\d[\d.,]*[.,]\d{2})(?![\d])/g;
+  let m; while ((m = re.exec(s))) { const v = moneyVal(m[2]); if (v == null) continue; all.push(v); if (m[1]) dollars.push(v); }
+  return dollars.length ? dollars : all;   // when amounts carry "$", hours/rates are ignored
+}
+function labelOf(line){
+  return line.replace(/\$?\s?\d[\d.,]*[.,]\d{2}\b/g, " ").replace(/\b\d+(?:\.\d+)?\s*%/g, " ").replace(/[|_=~]+/g, " ").replace(/\s+/g, " ").trim();
+}
+
+/* --- plain text (pasted, or OCR fallback) → rows --- */
+function textToRows(text){
+  return String(text || "").split(/\r?\n/).map(l => l.replace(/\s+/g, " ").trim()).filter(Boolean).map(l => {
+    const nums = stubNumbers(l);
+    return { label: labelOf(l), cur: nums.length >= 2 ? nums[nums.length-2] : (nums.length ? nums[0] : null), ytd: nums.length >= 2 ? nums[nums.length-1] : null, src: l };
+  });
+}
+
+/* --- OCR word boxes → rows. Amounts are right-aligned, so the two largest
+   right-edge clusters of money values are the "current" and "YTD" columns.
+   Labels sit left of them; on tilted/keystoned photos the label column drifts
+   from the amounts down the page, so we fit that drift anchored at the top. --- */
+function blockWords(blocks, dx, dy){
+  const W = []; dx = dx || 0; dy = dy || 0;
+  (blocks || []).forEach(b => (b.paragraphs || []).forEach(p => (p.lines || []).forEach(l => (l.words || []).forEach(w => {
+    const t = (w.text || "").trim(); if (!t || !w.bbox) return;
+    const x0 = w.bbox.x0 + dx, x1 = w.bbox.x1 + dx, y0 = w.bbox.y0 + dy, y1 = w.bbox.y1 + dy;
+    W.push({ t, x0, x1, y0, y1, xc:(x0+x1)/2, yc:(y0+y1)/2, h:y1-y0, v:moneyVal(t), dol:/\$/.test(t), conf:w.confidence || 0 });
+  }))));
+  return W;
+}
+// add words from a second pass where the first pass found nothing (or something less confident)
+function mergeWords(A, B){
+  const out = A.slice();
+  B.forEach(b => {
+    let hit = -1, best = 0;
+    out.forEach((a, i) => { const ix = Math.max(0, Math.min(a.x1, b.x1) - Math.max(a.x0, b.x0)), iy = Math.max(0, Math.min(a.y1, b.y1) - Math.max(a.y0, b.y0));
+      const ov = ix * iy / Math.max(1, Math.min((a.x1-a.x0)*(a.y1-a.y0), (b.x1-b.x0)*(b.y1-b.y0))); if (ov > best){ best = ov; hit = i; } });
+    if (best < 0.3) out.push(b);
+    else if (b.v != null){ if (out[hit].v == null || b.conf > out[hit].conf) out[hit] = b; }   // amounts: keep the surer read
+    else if (out[hit].v == null && b.conf > out[hit].conf + 10 && /[a-z0-9]{2,}/i.test(b.t)) out[hit] = b;
+  });
   return out;
 }
-function parseStub(text){
-  const lines = String(text || "").split(/\r?\n/).map(l => l.replace(/\s+/g, " ").trim()).filter(Boolean);
-  const res = {};
-  STUB_FIELDS.forEach(f => {
-    const hits = [];
-    lines.forEach(l => {
-      if (!f.inc.test(l) || f.exc.test(l)) return;
-      const nums = stubNumbers(l); if (!nums.length) return;
-      hits.push({ line:l, cur: nums.length >= 2 ? nums[nums.length-2] : nums[0], ytd: nums.length >= 2 ? nums[nums.length-1] : null });
-    });
-    if (!hits.length) { res[f.key] = null; return; }
-    let use;
-    if (f.sum) use = hits;
-    else if (f.key === "gross") use = [hits.find(h => /total/i.test(h.line) && h.ytd != null) || hits.find(h => h.ytd != null) || hits[0]];
-    else use = [hits.find(h => h.ytd != null) || hits[0]];
-    res[f.key] = {
-      cur: use.reduce((a, h) => a + (h.cur || 0), 0),
-      ytd: use.some(h => h.ytd != null) ? use.reduce((a, h) => a + (h.ytd || 0), 0) : null,
-      lines: use.map(h => h.line)
-    };
+function tableGeom(W){
+  const hs = W.filter(w => /[a-z]/i.test(w.t)).map(w => w.h).sort((a,b) => a-b);
+  const H = hs.length ? hs[Math.floor(hs.length/2)] : 20;
+  let M = W.filter(w => w.v != null);
+  if (M.filter(w => w.dol).length >= 8) M = M.filter(w => w.dol);
+  if (M.length < 6) return null;
+  const byX = M.slice().sort((a,b) => a.x1 - b.x1), cl = [];
+  byX.forEach(w => { const c = cl[cl.length-1]; if (c && w.x1 - c[c.length-1].x1 < 1.5*H) c.push(w); else cl.push([w]); });
+  const big = cl.filter(c => c.length >= 3).sort((a,b) => b.length - a.length).slice(0, 2).sort((a,b) => a[0].x1 - b[0].x1);
+  if (big.length < 2) return null;
+  const run = c => { const s = c.slice().sort((a,b) => a.yc - b.yc), out = [[s[0]]];
+    for (let k = 1; k < s.length; k++){ if (s[k].yc - s[k-1].yc > 10*H) out.push([s[k]]); else out[out.length-1].push(s[k]); }
+    return out.sort((a,b) => b.length - a.length)[0]; };
+  const ytdC = run(big[1]);   // YTD has a value on (almost) every row → defines the table's extent
+  const yT = ytdC[0].yc - 2*H, yB = ytdC[ytdC.length-1].yc + 2*H;
+  const curC = big[0].filter(w => w.yc >= yT && w.yc <= yB).sort((a,b) => a.yc - b.yc);
+  if (curC.length < 2) return null;
+  const top = Math.min(curC[0].yc, ytdC[0].yc), bottom = Math.max(curC[curC.length-1].yc, ytdC[ytdC.length-1].yc);
+  const pageW = Math.max(...W.map(q => q.x1));
+  const nums = W.filter(w => w.v != null && w.yc > top - H && w.yc < bottom + H && w.x0 > 0.15 * pageW);
+  const labelMax = Math.min(...curC.map(w => w.x0), ...nums.map(w => w.x0)) - 0.5*H;
+  return { H, curC, ytdC, top, bottom, labelMax };
+}
+function blocksToRows(blocks, extraWords){
+  let W = Array.isArray(blocks) && blocks.length && blocks[0] && blocks[0].t != null ? blocks : blockWords(blocks);
+  if (extraWords && extraWords.length) W = mergeWords(W, extraWords);
+  if (W.length < 10) return null;
+  const G = tableGeom(W); if (!G) return null;
+  const { H, curC, ytdC, top, bottom, labelMax } = G;
+  // amount rows: YTD anchors, attach current amounts on the same line
+  const A = ytdC.map(w => ({ y:w.yc, ytd:w.v, cur:null, yt:w.t, ct:"" }));
+  curC.forEach(c => {
+    let best = null, bd = Infinity; A.forEach(r => { const d = Math.abs(r.y - c.yc); if (d < bd && r.cur == null){ bd = d; best = r; } });
+    if (best && bd < 0.7*H){ best.cur = c.v; best.ct = c.t; } else A.push({ y:c.yc, ytd:null, cur:c.v, yt:"", ct:c.t });
   });
-  // pay / check date → next bi-weekly payday
+  A.sort((a,b) => a.y - b.y);
+  // label words: text left of the leftmost numeric column inside the table's vertical span
+  const LW = W.filter(w => w.v == null && w.x1 <= labelMax && w.yc > top - 0.8*H && w.yc < bottom + 1.2*H && /[a-z0-9]/i.test(w.t)).sort((a,b) => a.yc - b.yc);
+  const L = [];
+  LW.forEach(w => { const r = L[L.length-1]; if (r && w.yc - r.y < 0.55*H){ r.w.push(w); r.y = r.w.reduce((s,x) => s + x.yc, 0) / r.w.length; } else L.push({ y:w.yc, w:[w] }); });
+  L.forEach(r => { r.label = r.w.sort((a,b) => a.x0 - b.x0).map(x => x.t).join(" ").replace(/[|_=~]+/g, " ").replace(/\s+/g, " ").trim(); });
+  const labels = L.filter(r => /[a-z]/i.test(r.label) && r.label.replace(/[^a-z0-9]/gi, "").length >= 3);
+  if (!labels.length) return null;
+  // drift fit: amountY = labelY + s·(labelY − top) + c, small c, s in [−4%, +8%]
+  const fit = (s, c) => { let n = 0, e = 0; labels.forEach(r => { const m = r.y + s*(r.y - top) + c; let d = Infinity; A.forEach(x => { const q = Math.abs(x.y - m); if (q < d) d = q; }); if (d < 0.38*H){ n++; e += d; } }); return n * 1000 - e; };
+  let best = { s:0, c:0, sc:-Infinity };
+  for (let s = -0.04; s <= 0.0801; s += 0.002) for (let c = -0.4*H; c <= 0.401*H; c += 0.1*H){ const sc = fit(s, c); if (sc > best.sc) best = { s, c, sc }; }
+  const pairs = [];
+  labels.forEach((r, i) => A.forEach((x, j) => { const d = Math.abs(x.y - (r.y + best.s*(r.y - top) + best.c)); if (d < 0.5*H) pairs.push([d, i, j]); }));
+  pairs.sort((a,b) => a[0] - b[0]);
+  const usedL = new Set(), usedA = new Set(), match = {};
+  pairs.forEach(([, i, j]) => { if (usedL.has(i) || usedA.has(j)) return; usedL.add(i); usedA.add(j); match[i] = A[j]; });
+  const rows = labels.map((r, i) => {
+    const m = match[i];
+    return { y:r.y, label:r.label, cur: m ? m.cur : null, ytd: m ? m.ytd : null, src: `${r.label}   ${m && m.ct ? m.ct : "—"}   ${m && m.yt ? m.yt : "—"}` };
+  });
+  // amount rows nobody claimed stay as unlabeled rows (the top one is usually the Earnings total)
+  A.forEach((x, j) => { if (!usedA.has(j)) rows.push({ y:(x.y - best.c + best.s*top) / (1 + best.s), label:"", cur:x.cur, ytd:x.ytd, src:`(no label)   ${x.ct || "—"}   ${x.yt || "—"}` }); });
+  rows.sort((a,b) => a.y - b.y);
+  rows.firstAmount = A[0];
+  return rows;
+}
+
+/* --- rows → the six W-2 fields --- */
+function extractFields(rows, fullText){
+  let sec = null;
+  rows.forEach(r => { const s = sectionOf(r.label); if (s){ sec = s; r.header = true; } r.sec = sec; });
+  const usable = rows.filter(r => r.sec !== "memo" && r.sec !== "net");
+  const has = r => r.cur != null || r.ytd != null;
+  const pack = list => list.length ? { cur:list.reduce((a,r) => a + (r.cur || 0), 0), ytd:list.some(r => r.ytd != null) ? list.reduce((a,r) => a + (r.ytd || 0), 0) : null, lines:list.map(r => r.src) } : null;
+  const match = f => usable.filter(r => has(r) && !r.header && f.inc.test(r.label) && !f.exc.test(r.label));
+  const pickOne = list => list.length ? [list.find(r => r.ytd != null) || list[0]] : [];
+  const res = {};
+  // gross: an explicit gross line, else Earnings total + Taxable Benefits total
+  const gx = usable.filter(r => has(r) && /\b(total\s*)?gross(\s*(pay|earnings|wages))?\b/i.test(r.label) && !/gross\s*-?\s*up|\bnet\b|taxable/i.test(r.label));
+  if (gx.length) res.gross = pack([gx.find(r => /total/i.test(r.label) && r.ytd != null) || gx.find(r => r.ytd != null) || gx[0]]);
+  else {
+    const g = rows.filter(r => r.header && has(r) && (r.sec === "earnings" || r.sec === "benefits"));
+    if (!g.some(r => r.sec === "earnings") && rows.firstAmount){
+      const fa = rows.firstAmount; g.unshift({ cur:fa.cur, ytd:fa.ytd, src:`Earnings total (top row)   ${fa.ct || "—"}   ${fa.yt || "—"}` });
+    }
+    res.gross = pack(g);
+  }
+  const F = k => STUB_FIELDS.find(f => f.key === k);
+  res.fwh = pack(pickOne(match(F("fwh"))));
+  res.swh = pack(pickOne(match(F("swh"))));
+  res.k401 = pack(match(F("k401")));
+  // local: named city/school rows, plus any other tax that isn't federal, FICA/Medicare or state
+  const lw = match(F("lwh"));
+  rows.filter(r => r.sec !== "memo" && r.sec !== "net" && !r.header && has(r) && !lw.includes(r) && (r.sec === "taxes" || /\bw\s*\/?\s*h\b|withh/i.test(r.label))).forEach(r => {
+    const L = r.label;
+    if (!/w\s*\/?\s*[hm]\b|\btax\b|withh|\bsdit\b|\blit\b/i.test(L)) return;   // only real tax lines
+    if (F("fwh").inc.test(L) || /fica|f[ci]ca|soc|medicare|\bmed\b|oasdi|social/i.test(L) || (F("swh").inc.test(L) && !F("swh").exc.test(L))) return;
+    lw.push(r);
+  });
+  res.lwh = pack(lw);
+  // other pre-tax: the Pre-Tax Deductions total minus 401(k) when the stub has that total; otherwise sum the items
+  const preTot = rows.find(r => r.header && r.sec === "pretax" && has(r));
+  if (preTot && res.k401){
+    res.pre = { cur:(preTot.cur || 0) - (res.k401.cur || 0), ytd:preTot.ytd != null ? preTot.ytd - (res.k401.ytd || 0) : null, lines:[preTot.src + "   (total − 401k)"] };
+  } else res.pre = pack(match(F("pre")));
+  // pay date
+  const flat = String(fullText || "").replace(/\s+/g, " ");
   let pay = null;
-  const dm = /(?:pay|check|advice|deposit)\s*date\D{0,6}(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/i.exec(text)
-          || /(?:pay|check|advice|deposit)\s*date\D{0,6}([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})/i.exec(text);
+  const dm = /(?:pay|check|advice|deposit)\s*date[^0-9a-z]{0,40}(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/i.exec(flat)
+          || /(?:pay|check|advice|deposit)\s*date[^0-9a-z]{0,40}([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})/i.exec(flat);
   if (dm){
     let y, mo, d;
     if (/^\d/.test(dm[1])){ mo = +dm[1]; d = +dm[2]; y = +dm[3]; if (y < 100) y += 2000; }
@@ -885,8 +1033,23 @@ function parseStub(text){
     if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31 && y > 2000) pay = `${y}-${pad(mo)}-${pad(d)}`;
   }
   res.payDate = pay;
-  res.lineCount = lines.length;
+  res.lineCount = rows.length;
+  res.rowsText = rows.map(r => r.src).join("\n");
+  res.mode = rows.mode || "text";
   return res;
+}
+// whole-page words → text lines (used for the pay date and as a fallback)
+function wordsToText(W){
+  if (!W || !W.length) return "";
+  const hs = W.map(w => w.h).sort((a,b) => a-b), H = hs[Math.floor(hs.length/2)] || 20;
+  const S = W.slice().sort((a,b) => a.yc - b.yc), L = [];
+  S.forEach(w => { const r = L[L.length-1]; if (r && w.yc - r.y < 0.6*H){ r.w.push(w); r.y = (r.y*(r.w.length-1) + w.yc) / r.w.length; } else L.push({ y:w.yc, w:[w] }); });
+  return L.map(r => r.w.sort((a,b) => a.x0 - b.x0).map(w => w.t).join(" ")).join("\n");
+}
+// rows: from the photo reader (column-matched) — or null to parse pasted text line by line
+function parseStub(text, rows){
+  if (rows && rows.length) rows.mode = "columns"; else rows = textToRows(text);
+  return extractFields(rows, text);
 }
 function addDays(s, k){ const d = parseDate(s); if (!d) return ""; d.setDate(d.getDate() + k); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
 function countPaychecks(nextStr, year){
@@ -909,29 +1072,84 @@ function loadTesseract(){
   });
   return tessP;
 }
-function prepImage(file){
+// Photo cleanup before OCR: upscale, straighten, blur away screen moiré,
+// then adaptive (local) black/white so uneven lighting and glare drop out.
+function toGray(px, n){ const g = new Uint8ClampedArray(n); for (let i = 0, j = 0; i < n; i++, j += 4) g[i] = (px[j]*77 + px[j+1]*150 + px[j+2]*29) >> 8; return g; }
+function boxBlur(src, w, h, r){
+  if (r < 1) return src;
+  const tmp = new Uint8ClampedArray(src.length), out = new Uint8ClampedArray(src.length), d = 2*r + 1;
+  for (let y = 0; y < h; y++){ const o = y*w; let s = 0;
+    for (let x = -r; x <= r; x++) s += src[o + Math.min(w-1, Math.max(0, x))];
+    for (let x = 0; x < w; x++){ tmp[o+x] = s / d; s += src[o + Math.min(w-1, x+r+1)] - src[o + Math.max(0, x-r)]; } }
+  for (let x = 0; x < w; x++){ let s = 0;
+    for (let y = -r; y <= r; y++) s += tmp[Math.min(h-1, Math.max(0, y))*w + x];
+    for (let y = 0; y < h; y++){ out[y*w+x] = s / d; s += tmp[Math.min(h-1, y+r+1)*w + x] - tmp[Math.max(0, y-r)*w + x]; } }
+  return out;
+}
+function adaptive(g, w, h, win, off){
+  const W1 = w + 1, ii = new Uint32Array(W1 * (h + 1)), out = new Uint8ClampedArray(w*h), r = win >> 1;
+  for (let y = 0; y < h; y++){ let row = 0; for (let x = 0; x < w; x++){ row += g[y*w+x]; ii[(y+1)*W1 + x + 1] = ii[y*W1 + x + 1] + row; } }
+  for (let y = 0; y < h; y++){
+    const ya = Math.max(0, y-r), yb = Math.min(h, y+r+1);
+    for (let x = 0; x < w; x++){
+      const xa = Math.max(0, x-r), xb = Math.min(w, x+r+1);
+      const s = ii[yb*W1+xb] - ii[ya*W1+xb] - ii[yb*W1+xa] + ii[ya*W1+xa];
+      out[y*w+x] = g[y*w+x] * (yb-ya) * (xb-xa) < (s - off * (yb-ya) * (xb-xa)) ? 0 : 255;
+    }
+  }
+  return out;
+}
+function estimateSkew(bin, w, h){
+  const pts = []; for (let y = 0; y < h; y += 1) for (let x = 0; x < w; x += 2) if (!bin[y*w+x]) pts.push(x, y);
+  let best = 0, bs = -1;
+  for (let a = -4; a <= 4.0001; a += 0.2){
+    const t = Math.tan(a * Math.PI / 180), hist = new Float64Array(h + w);
+    for (let i = 0; i < pts.length; i += 2){ const yy = Math.round(pts[i+1] - pts[i]*t + w*0.1); if (yy >= 0 && yy < hist.length) hist[yy]++; }
+    let s = 0; for (let i = 1; i < hist.length; i++){ const d = hist[i] - hist[i-1]; s += d*d; }
+    if (s > bs){ bs = s; best = a; }
+  }
+  return best;   // degrees; rows slope down-right when positive
+}
+function prepImage(file, opt){
+  opt = Object.assign({ blur:1.1, long:3200 }, opt || {});
   return new Promise((ok, bad) => {
     const url = URL.createObjectURL(file), img = new Image();
     img.onload = () => {
-      const long = Math.max(img.naturalWidth, img.naturalHeight);
-      const scale = long > 2600 ? 2600 / long : (long < 1400 ? 1400 / long : 1);
-      const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
-      const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
-      const cx = cv.getContext("2d"); cx.drawImage(img, 0, 0, w, h);
-      // grayscale + gentle contrast stretch helps with phone photos
-      const id = cx.getImageData(0, 0, w, h), px = id.data;
-      let lo = 255, hi = 0;
-      for (let i = 0; i < px.length; i += 16){ const g = px[i]*.299 + px[i+1]*.587 + px[i+2]*.114; if (g < lo) lo = g; if (g > hi) hi = g; }
-      const span = Math.max(40, hi - lo);
-      for (let i = 0; i < px.length; i += 4){
-        let g = (px[i]*.299 + px[i+1]*.587 + px[i+2]*.114 - lo) * 255 / span;
-        g = g < 0 ? 0 : g > 255 ? 255 : g; px[i] = px[i+1] = px[i+2] = g;
-      }
-      cx.putImageData(id, 0, 0);
-      const tc = document.createElement("canvas"), ts = 360 / Math.max(w, h);
-      tc.width = Math.round(w * ts); tc.height = Math.round(h * ts); tc.getContext("2d").drawImage(cv, 0, 0, tc.width, tc.height);
-      URL.revokeObjectURL(url);
-      ok({ canvas: cv, thumb: tc.toDataURL("image/jpeg", .7) });
+      try {
+        const w0 = img.naturalWidth, h0 = img.naturalHeight, long0 = Math.max(w0, h0);
+        // 1) skew from a small cleaned copy
+        const ss = 1000 / long0, sw = Math.round(w0*ss), sh = Math.round(h0*ss);
+        const sc = document.createElement("canvas"); sc.width = sw; sc.height = sh;
+        const sx = sc.getContext("2d"); sx.drawImage(img, 0, 0, sw, sh);
+        let sg = toGray(sx.getImageData(0, 0, sw, sh).data, sw*sh);
+        sg = boxBlur(boxBlur(sg, sw, sh, 1), sw, sh, 1);
+        const angle = estimateSkew(adaptive(sg, sw, sh, 31, 10), sw, sh);
+        // 2) full-size working copy: upscale to ~3200px long side and rotate level
+        const scale = Math.min(3, Math.max(0.5, opt.long / long0));
+        const w = Math.round(w0*scale), h = Math.round(h0*scale);
+        const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+        const cx = cv.getContext("2d");
+        cx.fillStyle = "#fff"; cx.fillRect(0, 0, w, h);
+        cx.imageSmoothingQuality = "high";
+        cx.translate(w/2, h/2); cx.rotate(-angle * Math.PI / 180); cx.drawImage(img, -w/2, -h/2, w, h); cx.setTransform(1, 0, 0, 1, 0, 0);
+        const id = cx.getImageData(0, 0, w, h);
+        let g = toGray(id.data, w*h);
+        // 3) de-moiré blur (≈ gaussian via 3 box passes), 4) local threshold
+        const r = Math.max(1, Math.round(scale * opt.blur));
+        g = boxBlur(boxBlur(boxBlur(g, w, h, r), w, h, r), w, h, r);
+        const bin = adaptive(g, w, h, (Math.round(Math.max(w, h) / 46) | 1), 12);
+        // two versions: smoothed gray (best for reading words) and black/white (best for finding every number)
+        const px = id.data; for (let i = 0, j = 0; i < g.length; i++, j += 4){ px[j] = px[j+1] = px[j+2] = g[i]; px[j+3] = 255; }
+        cx.putImageData(id, 0, 0);
+        const bc = document.createElement("canvas"); bc.width = w; bc.height = h;
+        const bx = bc.getContext("2d"), bd = bx.createImageData(w, h), bp = bd.data;
+        for (let i = 0, j = 0; i < bin.length; i++, j += 4){ bp[j] = bp[j+1] = bp[j+2] = bin[i]; bp[j+3] = 255; }
+        bx.putImageData(bd, 0, 0);
+        const tc = document.createElement("canvas"), ts = 360 / Math.max(w0, h0);
+        tc.width = Math.round(w0 * ts); tc.height = Math.round(h0 * ts); tc.getContext("2d").drawImage(img, 0, 0, tc.width, tc.height);
+        URL.revokeObjectURL(url);
+        ok({ gray: cv, bin: bc, canvas: bc, thumb: tc.toDataURL("image/jpeg", .7), angle });
+      } catch(e){ URL.revokeObjectURL(url); bad(e); }
     };
     img.onerror = () => { URL.revokeObjectURL(url); bad(new Error("image")); };
     img.src = url;
@@ -966,7 +1184,7 @@ function failHTML(title, stage, err){
     <h4 class="subhead">Or paste the text</h4>` + pasteHTML("", "");
 }
 async function runOCR(file){
-  SCAN = { parsed:null, raw:"", thumb:"" };
+  SCAN = { parsed:null, raw:"", thumb:"", rows:null };
   openSheet(progressHTML("Preparing photo…", .02));
   let prepped, stage = "opening the photo";
   try { prepped = await withTimeout(prepImage(file), 30000, "Opening the photo"); }
@@ -986,10 +1204,39 @@ async function runOCR(file){
       },
       errorHandler: () => {}
     }), 120000, "Starting the reader");
+    // pass 1: whole page, sparse mode, black/white → finds every number and the table's columns
     stage = "reading the text";
-    await worker.setParameters({ preserve_interword_spaces: "1" });
-    const out = await withTimeout(worker.recognize(prepped.canvas), 120000, "Reading the text");
-    SCAN.raw = (out && out.data && out.data.text) || "";
+    setProgress("Reading the page (1 of 3)…", .4);
+    await worker.setParameters({ preserve_interword_spaces: "1", tessedit_pageseg_mode: "11" });
+    const out = await withTimeout(worker.recognize(prepped.bin, {}, { text:true, blocks:true }), 150000, "Reading the text");
+    const A = blockWords(out && out.data && out.data.blocks);
+    SCAN.raw = wordsToText(A) || (out && out.data && out.data.text) || "";
+    const G = tableGeom(A);
+    SCAN.rows = null;
+    if (G){
+      // passes 2–3: re-read the label column and the amount columns from the smoothed gray image
+      const crop = (x0, y0, x1, y1) => { x0 = Math.max(0, Math.round(x0)); y0 = Math.max(0, Math.round(y0)); x1 = Math.min(prepped.gray.width, Math.round(x1)); y1 = Math.min(prepped.gray.height, Math.round(y1));
+        const c = document.createElement("canvas"); c.width = Math.max(1, x1 - x0); c.height = Math.max(1, y1 - y0); c.getContext("2d").drawImage(prepped.gray, x0, y0, c.width, c.height, 0, 0, c.width, c.height); return { c, x0, y0 }; };
+      const yA = G.top - 2*G.H, yB = G.bottom + 2*G.H;
+      await worker.setParameters({ tessedit_pageseg_mode: "6" });
+      stage = "re-reading the labels";
+      setProgress("Checking the labels (2 of 3)…", .7);
+      const ls = crop(0, yA, G.labelMax + G.H, yB);
+      const ol = await withTimeout(worker.recognize(ls.c, {}, { text:false, blocks:true }), 120000, "Re-reading the labels");
+      stage = "re-reading the amounts";
+      setProgress("Checking the amounts (3 of 3)…", .85);
+      const ns = crop(G.labelMax - G.H, yA, prepped.gray.width, yB);
+      const on = await withTimeout(worker.recognize(ns.c, {}, { text:false, blocks:true }), 120000, "Re-reading the amounts");
+      const extra = blockWords(ol.data.blocks, ls.x0, ls.y0).filter(w => w.v == null).concat(blockWords(on.data.blocks, ns.x0, ns.y0).filter(w => w.v != null));
+      SCAN.rows = blocksToRows(A, extra);
+    }
+    if (!SCAN.rows){
+      // no table found: read the page as ordinary lines and parse them
+      stage = "reading the page as text";
+      await worker.setParameters({ tessedit_pageseg_mode: "3" });
+      const o3 = await withTimeout(worker.recognize(prepped.gray), 150000, "Reading the page");
+      SCAN.raw = (o3 && o3.data && o3.data.text) || SCAN.raw;
+    }
   } catch(e){
     if (worker) try { await worker.terminate(); } catch(_){}
     openSheet(failHTML("Scan stopped while " + stage, stage, e));
@@ -998,18 +1245,18 @@ async function runOCR(file){
   if (!SCAN.raw.trim()){ try { await worker.terminate(); } catch(_){}
     openSheet(failHTML("No text found in that photo", "reading the text", "OCR returned no text — try a sharper, straight-on photo with the stub filling the frame")); return; }
   try { await worker.terminate(); } catch(_){}
-  showReview(SCAN.raw);
+  showReview(SCAN.raw, SCAN.rows);
 }
-function showReview(text){
+function showReview(text, colRows){
   SCAN.raw = text;
-  const P = parseStub(text);
+  const P = parseStub(text, colRows);
   SCAN.parsed = P;
   const found = STUB_FIELDS.filter(f => P[f.key]).length;
   const v = x => x == null ? "" : (Math.round(x * 100) / 100).toFixed(2);
   const rows = STUB_FIELDS.map(f => {
     const r = P[f.key];
     return `<div class="rv${r ? "" : " off"}" data-rv="${f.key}">
-      <div class="rv-hd"><label><input type="checkbox" data-use="${f.key}" ${r ? "checked" : ""}><span>${f.label}</span></label>${r ? "" : `<span class="miss">not found</span>`}</div>
+      <div class="rv-hd"><label><input type="checkbox" data-use="${f.key}" ${r ? "checked" : ""}><span>${f.label}</span></label>${r ? (r.ytd == null ? `<span class="miss">YTD not read</span>` : (r.cur == null ? `<span class="miss">this check not read</span>` : "")) : `<span class="miss">not found</span>`}</div>
       <div class="row2" style="margin-top:8px">
         <label class="field" style="margin:0"><span class="lbl">This check</span><span class="inp has-pre"><span class="affix">$</span><input type="text" inputmode="decimal" data-sv="${f.key}:cur" value="${v(r && r.cur)}" placeholder="0.00"></span></label>
         <label class="field" style="margin:0"><span class="lbl">Year to date</span><span class="inp has-pre"><span class="affix">$</span><input type="text" inputmode="decimal" data-sv="${f.key}:ytd" value="${v(r && r.ytd)}" placeholder="0.00"></span></label>
@@ -1034,7 +1281,7 @@ function showReview(text){
       <label class="btn" for="stubFile" role="button">Retake photo</label>
       <button class="btn" type="button" data-act="scanpaste">Edit text</button>
     </div>
-    <details style="margin-top:14px"><summary class="note" style="cursor:pointer">Show recognized text (${P.lineCount} lines)</summary><pre class="raw">${esc(text)}</pre></details>`);
+    <details style="margin-top:14px"><summary class="note" style="cursor:pointer">Show what was read (${P.lineCount} rows${P.mode === "columns" ? ", matched by column" : ""})</summary><pre class="raw">${esc(P.rowsText)}</pre></details>`);
 }
 function applyScan(){
   const body = $("scanBody"); let applied = 0;
@@ -1103,7 +1350,7 @@ document.addEventListener("click", e => {
   } else if (act === "scanpaste"){
     openSheet(pasteHTML(SCAN.raw));
   } else if (act === "scanread"){
-    const t = $("stubText"); if (t && t.value.trim()) { SCAN.thumb = ""; showReview(t.value); }
+    const t = $("stubText"); if (t && t.value.trim()) { SCAN.thumb = ""; SCAN.rows = null; showReview(t.value, null); }
   } else if (act === "scanapply"){
     applyScan();
   } else if (act === "scanclose"){
