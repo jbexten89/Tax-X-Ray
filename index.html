@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tax X-Ray</title>
+<meta name="description" content="Federal, Ohio and local income tax estimator for W-2 + Schedule C. Runs entirely on your device.">
+<meta name="theme-color" content="#07080A">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tax X-Ray">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAFlklEQVR42u1a2U4cRxS991ZVN8uwGYMxwoqjYMtGfoqlKPmH/Eb+LX8QKQ9+8UMSK1YcOcIRXmXLeAGGbdau5eShZ4YderobkJVpiTemqs5dzz1VHA+N0Jf8CX3h3wDAAMAAwADA5X46x2+YGQCAkm0pkmPNPACcs1obYyIAxIUPDiJmBJ8kbRHFzOcLAMD0zNz4xBUA6eZlWB8i0qjXNtY+eu9YFGV2BfdFJUII8ws3ldbbmxve+xLjh5krYxPx0PD7ty+999n9INl38N6PT0xpY9Y+rfrgudSPiLaq6+1Wc3pmLpwLAICZJqama7s7SikuJ3IORrMxtd3tkdFKFMchhPLLaGqV4D2dw+l7CRYCWGTQB/rxSSmGvxwA1iYpkIKn11rntoXObXvn7OLtpa++/sZZSzm3h1J6s7r+9MnjS/BACBifmJi+OpMkCecHYIg73ISIiXBBAAAYY548frT8z9+UP4DBzNZaAMx5Tl80B0TEJu18luskD8AiRYqBpqIUUvVF2w6TnMJ1TBepdwC6GZzFA6y1zrQFLsQDAKIoHp+5BmRp+wxge6sawpmNHGV4gIko5TvM3F0SDCESJmEWcTa59+39xVt3k6R9ZhADZIx59NvDl8+fRVF8YucCgZmVUBDq5XX6d4Jn9PGnZ2YlLELCxCxdk7PRFCsWTSxK8+u3r3abtczEi9c2P5uRYRLhk8wMUKQ4NkrAzCBiEAHwHgEUwtHfHQuAxWiONBstWpFIal8AUhlSbGEtMyvm7aS++e5F5k4MpY2erJwyrKRb6PERcoaZAaIAeB+sQ+KCdUcx6KPmZ5HgvAjLUMSRFqXSWgGAYyMuEtVh8CqOqK/6fSbpASQ2Ese9LeB9SEAJgrUscjTdDk9krCRYN/n90sJPPyJltrJnYGOi4H1vFC5rKtiLbpDS2jm7hxSACxKb9V/++PDzAzaKfDgjhOB9NDNZWbrpmwnLaUcsZaoEoJTeXwXM4fMEPTZcW35DCETqrJmYiZUipmh2SleGOTb7Q2h6dq7ZqDvnRNg7P79wY/bavPcuXysFIKJqtZ3XL1eYOG1zY5NTW+trztm0CMGHkFjfTJJPVVgPHw6lkD7GnSGI0W6z5hstMZq6rR6Aw1BSrzlnRcRZayavj06xczn7KcBKsW/CftzsVmq4Nrc/b6QAQCAf4HxoWwJ1dZAzVQkmEhGtKK2kTD0PzM3fqNd2ne2uDhgTFeByxEzOuS6ZIwBTV66ufV611nYaUKqgOQ8fEAIFZCijIAohWFAnNLjncbQcmklIVycionYzKS6oUFox0y3aLjSSYHsUPbU7UjCZO3HnvwE+ELIcQB7kQ+oTZhaWvoK+U8Gwz9thX2AAHADv4f1eXKIIF8LBNnlEY/TOZ+5jpI0RkYNrHsux+2gtOucUzxy8uzozN3d93u+31mncn96+eVWv1+RU1YS5v+6SdyYm8t7furN0+869JGnxmYGEYKI4scnKs6dKDWcjsOc8Umpt/vrz91fP/w0HMuUUOh02q1VjohJPX2geYOak3fq4+j67x7XWpat6BYUtMZHOnnEgorKvRYrOxCG44kP9pQEIIURxXJ6scrHKXJIk97/7YfH23YLCVrW69vDBrxctbBGRCO9sb2+srxWXFrvsHxdaRpXSL1aWX6wsf5Hibm9A+7Ll9dKvigdPDTIUn7JuZU6iWPuEtHJDiDl41Gs7w6OVZrOuTZS7ex2vAxI5Z0dGx6xtJ+2WaJ2xZ3O/b+Zu3FxsNhq13a3S439oaHhqemb13etWqylKnQuAtOTNzi2YKHbOlnZ2kNIKwPqnD43Grih9Xk8Nule5YbQy1nnsUdI7A+99vbYDILvtcwLo5oMvt4Yyp3clXJK8fqaCKULllqO8bEIX3nLQyAYABgAGAP7XAP4DfMpBjc40KNkAAAAASUVORK5CYII=">
+<style>
+:root{
+  --bg:#07080A; --panel:#111317; --panel2:#171A1F; --field:#0B0C0F; --border:#23272E; --border2:#2E333B;
+  --text:#E6E8EB; --muted:#8B929C; --dim:#5F6670;
+  --mint:#3CC79A; --mint-soft:rgba(60,199,154,.12); --amber:#E3A04F; --amber-ink:#1A1205;
+  --blue:#5AA9E6; --violet:#9B8CE8; --slate:#7A828D;
+  --r:16px;
+}
+*{box-sizing:border-box}
+html{color-scheme:dark;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Nunito Sans","Avenir Next",Avenir,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;line-height:1.4;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:560px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 14px) 16px calc(env(safe-area-inset-bottom) + 100px)}
+header .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+h1{font-size:26px;font-weight:800;letter-spacing:-.4px;margin:0}
+h1 b{color:var(--mint)}
+.chip{font-size:12px;font-weight:700;color:var(--muted);border:1px solid var(--border2);border-radius:999px;padding:4px 10px;white-space:nowrap}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row2>*{min-width:0}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin:12px 0}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stat-xl{font-size:44px;font-weight:800;letter-spacing:-1px;line-height:1.1;margin:4px 0 14px;font-variant-numeric:tabular-nums}
+.stat{font-size:28px;font-weight:800;letter-spacing:-.5px;font-variant-numeric:tabular-nums;margin-top:2px}
+.sub{font-size:13px;color:var(--muted);margin-top:2px}
+.mint{color:var(--mint)} .amber{color:var(--amber)} .muted{color:var(--muted)}
+.banner{border-radius:14px;padding:14px 16px;margin:12px 0;font-weight:700;font-size:15px}
+.banner .big{display:block;font-size:30px;font-weight:800;letter-spacing:-.5px;margin-top:2px;font-variant-numeric:tabular-nums}
+.banner.ok{background:var(--mint-soft);border:1px solid rgba(60,199,154,.35);color:var(--mint)}
+.banner.warn{background:var(--amber);color:var(--amber-ink)}
+.banner.warn .sm,.banner.ok .sm{display:block;font-weight:600;font-size:13px;margin-top:4px;opacity:.85}
+.note{font-size:13px;color:var(--muted);margin:8px 0 4px}
+.info{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:14px;color:var(--muted);margin:12px 0}
+.jur{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border)}
+.jur:first-of-type{border-top:none;padding-top:4px}
+.jur .name{font-weight:700}
+.jur .det{font-size:12px;color:var(--muted)}
+.jur .amt{text-align:right;font-weight:800;font-size:20px;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;padding:2px 8px;border-radius:999px;margin-top:2px}
+.tag.ok{background:var(--mint-soft);color:var(--mint)}
+.tag.warn{background:var(--amber);color:var(--amber-ink)}
+.bar{display:block;width:100%;height:22px;margin:12px 0 6px}
+.legend{list-style:none;margin:8px 0 0;padding:0}
+.legend li{display:flex;align-items:center;gap:10px;padding:7px 0;font-size:15px}
+.legend .dot{width:10px;height:10px;border-radius:3px;flex:none}
+.legend .lab{flex:1;min-width:0}
+.legend .v{font-weight:800;font-variant-numeric:tabular-nums}
+.legend .p{color:var(--muted);font-size:13px;width:44px;text-align:right;font-variant-numeric:tabular-nums}
+.slider{margin:14px 0}
+.slider .hd{display:flex;justify-content:space-between;font-size:14px;gap:8px}
+.slider .hd b{font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--mint);height:32px;margin:4px 0 0}
+.wires{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.wires>div{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;min-width:0}
+.wires .stat{font-size:22px}
+.xray{font-size:14px}
+.xray summary,.card summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
+.xray summary::-webkit-details-marker,.card summary::-webkit-details-marker{display:none}
+.chev{width:22px;height:22px;flex:none;color:var(--muted);transition:transform .2s}
+details[open]>summary .chev{transform:rotate(180deg)}
+.lines{margin-top:8px}
+.line{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px dashed var(--border)}
+.line span:last-child{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+.line.h{border-top:1px solid var(--border2);margin-top:6px;padding-top:10px;font-weight:800;color:var(--text)}
+.line.h span{font-weight:800}
+.line .muted{font-weight:600}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);margin:12px 0;padding:6px 16px}
+.card .ct{display:block;font-weight:800;font-size:17px}
+.card .cs{display:block;font-size:13px;color:var(--muted);margin-top:1px}
+.card-body{padding:2px 0 14px}
+.subhead{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--mint);margin:18px 0 4px}
+.field{display:block;margin:10px 0}
+.lbl{display:block;font-size:13px;color:var(--muted);margin-bottom:5px;font-weight:600}
+.inp{position:relative;display:block}
+.affix{position:absolute;top:50%;transform:translateY(-50%);color:var(--dim);font-weight:700;pointer-events:none;left:12px}
+.affix.suf{left:auto;right:12px}
+input[type=text],input[type=date],select{width:100%;min-width:0;background:var(--field);border:1px solid var(--border);border-radius:11px;color:var(--text);font:inherit;font-size:17px;padding:11px 12px;min-height:48px;-webkit-appearance:none;appearance:none}
+.has-pre input{padding-left:26px}
+.has-suf input{padding-right:30px}
+input:focus,select:focus{outline:none;border-color:var(--mint);box-shadow:0 0 0 3px rgba(60,199,154,.15)}
+input::placeholder{color:var(--dim)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6' fill='none' stroke='%238B929C' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:18px;padding-right:34px}
+.inline{display:flex;gap:8px}
+.inline input{flex:1}
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:52px;margin:6px 0;font-size:15px;font-weight:600}
+input[type=checkbox][role=switch]{-webkit-appearance:none;appearance:none;flex:none;width:52px;height:32px;border-radius:999px;background:var(--border2);position:relative;cursor:pointer;transition:background .2s;margin:0}
+input[type=checkbox][role=switch]::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#E6E8EB;transition:transform .2s}
+input[type=checkbox][role=switch]:checked{background:var(--mint)}
+input[type=checkbox][role=switch]:checked::after{transform:translateX(20px)}
+.btn{min-height:48px;border-radius:12px;border:1px solid var(--border2);background:var(--panel2);color:var(--text);font:inherit;font-weight:700;font-size:15px;padding:0 16px;cursor:pointer;white-space:nowrap}
+label.btn{display:inline-flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none}
+.vh{position:absolute!important;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0);pointer-events:none}
+.errd{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);background:var(--field);border:1px solid var(--border);border-radius:10px;padding:8px 10px;margin:8px 0;word-break:break-word}
+.btn.primary{background:var(--mint);border-color:var(--mint);color:#06110C}
+.btn.danger{color:var(--amber)}
+.btn.small{min-height:36px;font-size:13px;padding:0 12px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.btns .full{grid-column:1/-1}
+table.q{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+table.q th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:right;font-weight:800;padding:6px 4px}
+table.q th:first-child,table.q td:first-child{text-align:left}
+table.q td{padding:12px 4px;border-top:1px solid var(--border);text-align:right;font-variant-numeric:tabular-nums}
+table.q tr.past td{color:var(--dim)}
+table.q tr.next td{background:var(--mint-soft);color:var(--text)}
+table.q tr.next td:first-child{border-radius:10px 0 0 10px;box-shadow:inset 3px 0 0 var(--mint)}
+table.q tr.next td:last-child{border-radius:0 10px 10px 0}
+.due{font-weight:800}
+.due small{display:block;font-weight:600;color:var(--muted);font-size:11px}
+tr.next .due small{color:var(--mint)}
+.checkrow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;font-size:14px}
+.checkrow .ic{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:900}
+.checkrow .ic.ok{background:var(--mint);color:#06110C}
+.checkrow .ic.no{background:var(--amber);color:var(--amber-ink)}
+.checkrow .ic.na{background:var(--border2);color:var(--muted)}
+.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:10;display:flex;justify-content:center;background:rgba(7,8,10,.94);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--border);padding-bottom:env(safe-area-inset-bottom)}
+.tabbar .in{display:flex;width:100%;max-width:560px}
+.tabbar button{flex:1;min-height:60px;background:none;border:none;color:var(--muted);font:inherit;font-size:12px;font-weight:700;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+.tabbar button svg{width:24px;height:24px}
+.tabbar button[aria-selected=true]{color:var(--mint)}
+.tab[hidden]{display:none}
+footer{font-size:12px;color:var(--dim);margin:24px 2px 0;line-height:1.5}
+/* paystub scan */
+.scanbox{border:1px dashed var(--border2);border-radius:14px;padding:14px;margin:6px 0 10px;background:var(--panel2)}
+.scanbox .t{font-weight:800;font-size:15px}
+.scanbox .btns{margin-top:10px}
+.sheet{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center}
+.sheet[hidden]{display:none}
+.sheet-in{width:100%;max-width:560px;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--panel);border:1px solid var(--border);border-bottom:none;border-radius:20px 20px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom) + 18px)}
+.sheet-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.sheet-hd h2{font-size:20px;font-weight:800;margin:0}
+.xbtn{min-width:44px;min-height:44px;border-radius:12px;border:1px solid var(--border2);background:var(--panel2);color:var(--text);font-size:20px;cursor:pointer}
+.prog{height:8px;border-radius:99px;background:var(--panel2);overflow:hidden;margin:12px 0 6px}
+.prog i{display:block;height:100%;width:0;background:var(--mint);transition:width .2s}
+.thumb{display:block;max-width:100%;max-height:180px;border-radius:10px;border:1px solid var(--border);margin:10px auto 0;object-fit:contain}
+textarea{width:100%;min-height:160px;background:var(--field);border:1px solid var(--border);border-radius:11px;color:var(--text);font:inherit;font-size:16px;padding:12px;resize:vertical}
+textarea:focus{outline:none;border-color:var(--mint)}
+.rv{border-top:1px solid var(--border);padding:12px 0}
+.rv-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800}
+.rv-hd input{-webkit-appearance:none;appearance:none;width:24px;height:24px;border-radius:7px;border:2px solid var(--border2);background:var(--field);margin:0;flex:none;cursor:pointer;position:relative}
+.rv-hd input:checked{background:var(--mint);border-color:var(--mint)}
+.rv-hd input:checked::after{content:"";position:absolute;left:6px;top:2px;width:6px;height:11px;border:solid #06110C;border-width:0 3px 3px 0;transform:rotate(45deg)}
+.rv-hd label{display:flex;align-items:center;gap:10px;cursor:pointer;min-height:36px}
+.rv .src{font-size:12px;color:var(--dim);font-family:ui-monospace,Menlo,monospace;margin-top:6px;word-break:break-word}
+.rv .miss{font-size:12px;color:var(--amber);font-weight:700}
+.rv.off .row2{opacity:.4}
+pre.raw{white-space:pre-wrap;word-break:break-word;font-size:12px;color:var(--muted);background:var(--field);border:1px solid var(--border);border-radius:10px;padding:10px;max-height:260px;overflow:auto}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 76px);transform:translateX(-50%);z-index:60;background:var(--mint);color:#06110C;font-weight:800;padding:12px 18px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:calc(100% - 32px);text-align:center}
+@media (min-width:420px){.stat-xl{font-size:48px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="top">
+      <h1>Tax <b>X-Ray</b></h1>
+      <span class="chip" id="yearChip">Estimate</span>
+    </div>
+    <div class="row2">
+      <label class="field" style="margin:0"><span class="lbl">Tax year</span><select id="year" data-k="year"></select></label>
+      <label class="field" style="margin:0"><span class="lbl">Filing status</span><select id="status" data-k="status"></select></label>
+    </div>
+  </header>
+
+  <!-- ============ SUMMARY ============ -->
+  <section class="tab" id="tab-summary" role="tabpanel">
+    <div id="emptyState" class="panel" hidden>
+      <div class="eyebrow">Nothing to X-ray yet</div>
+      <p style="margin:8px 0 14px;color:var(--muted)">Enter your paystub and business numbers and the estimate builds as you type. Everything stays on this phone.</p>
+      <button class="btn primary" type="button" data-go="inputs">Enter my numbers</button>
+    </div>
+    <div id="summaryBody">
+      <div class="panel">
+        <div class="eyebrow" id="totalLabel">Projected total tax</div>
+        <div class="stat-xl" id="sTotal">$0</div>
+        <div class="row2">
+          <div><div class="eyebrow">Effective rate</div><div class="stat" id="sEff">0%</div><div class="sub">of total income</div></div>
+          <div><div class="eyebrow">Federal bracket</div><div class="stat" id="sMarg">0%</div><div class="sub" id="sMargSub"></div></div>
+        </div>
+      </div>
+      <div id="balanceBanner"></div>
+      <div class="panel" id="jurisdictions"></div>
+      <div class="panel">
+        <div class="eyebrow">Where it goes</div>
+        <svg class="bar" id="bar" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <ul class="legend" id="legend"></ul>
+      </div>
+      <div id="warnings"></div>
+      <div class="panel">
+        <div class="eyebrow">What-if</div>
+        <div class="slider">
+          <div class="hd"><span>Extra 401(k) this year</span><b id="wiKVal">$0</b></div>
+          <input type="range" id="wi_401k" data-k="wi_401k" min="0" max="20000" step="250" value="0">
+          <div class="sub" id="wiKHint"></div>
+        </div>
+        <div class="slider">
+          <div class="hd"><span>Extra business income</span><b id="wiBIVal">$0</b></div>
+          <input type="range" id="wi_biz_inc" data-k="wi_biz_inc" min="0" max="25000" step="250" value="0">
+        </div>
+        <div class="slider">
+          <div class="hd"><span>Extra business expenses</span><b id="wiBEVal">$0</b></div>
+          <input type="range" id="wi_biz_exp" data-k="wi_biz_exp" min="0" max="15000" step="250" value="0">
+        </div>
+        <div class="wires">
+          <div><div class="eyebrow">Total tax</div><div class="stat" id="wiTotal">$0</div><div class="sub" id="wiTotalD">no change</div></div>
+          <div><div class="eyebrow" id="wiBalLbl">Refund / owe</div><div class="stat" id="wiBal">$0</div><div class="sub" id="wiBalD">no change</div></div>
+        </div>
+        <div class="btns"><button class="btn small full" type="button" data-act="resetwi">Reset sliders</button></div>
+      </div>
+      <details class="panel xray">
+        <summary><span class="eyebrow">Line-by-line X-ray</span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary>
+        <div class="lines" id="lines"></div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ============ INPUTS ============ -->
+  <section class="tab" id="tab-inputs" role="tabpanel" hidden>
+    <div id="cards"></div>
+    <div class="panel">
+      <div class="eyebrow">Your data</div>
+      <p class="note">Saved only in this browser. Export a backup before clearing Safari data or switching phones.</p>
+      <div class="btns">
+        <button class="btn" type="button" data-act="export">Export JSON</button>
+        <button class="btn" type="button" data-act="import">Import JSON</button>
+        <button class="btn danger full" type="button" data-act="reset">Reset all</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+    </div>
+  </section>
+
+  <!-- ============ PLANNER ============ -->
+  <section class="tab" id="tab-plan" role="tabpanel" hidden>
+    <div id="planBody"></div>
+  </section>
+
+  <!-- ============ PAYSTUB SCAN SHEET ============ -->
+  <div class="sheet" id="scanSheet" hidden role="dialog" aria-modal="true" aria-labelledby="scanTitle">
+    <div class="sheet-in">
+      <div class="sheet-hd"><h2 id="scanTitle">Read paystub</h2><button class="xbtn" type="button" data-act="scanclose" aria-label="Close">×</button></div>
+      <div id="scanBody"></div>
+    </div>
+  </div>
+  <input type="file" id="stubFile" accept="image/*" class="vh" tabindex="-1" aria-hidden="true">
+
+  <footer>
+    Tax X-Ray is an estimate, not tax advice. It simplifies several rules (see the X-ray notes) and uses the figures in its built-in tax tables, which you should confirm before acting. Your numbers never leave this device.
+  </footer>
+</div>
+
+<nav class="tabbar" role="tablist">
+  <div class="in">
+    <button type="button" role="tab" data-tab="summary" aria-selected="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Summary</button>
+    <button type="button" role="tab" data-tab="inputs" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Inputs</button>
+    <button type="button" role="tab" data-tab="plan" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Planner</button>
+  </div>
+</nav>
+
+<script>
+/* =====================================================================
+   TAX_TABLES — every rate and dollar figure the app uses, keyed by year.
+   To add a new year: copy the 2026 block, change the key, and update each
+   value from the sources noted. The year picker reads keys automatically.
+   Sources checked Oct 29, 2026.
+   ===================================================================== */
+const TAX_TABLES = {
+  2026: {
+    label: "2026",
+    federal: {
+      // Ordinary income brackets: [upper limit of bracket, rate].
+      // Source: IRS Rev. Proc. 2025-32 §4.01 Tables 1–4 (released Oct 9, 2025).
+      brackets: {
+        single: [[12400,.10],[50400,.12],[105700,.22],[201775,.24],[256225,.32],[640600,.35],[Infinity,.37]],
+        mfj:    [[24800,.10],[100800,.12],[211400,.22],[403550,.24],[512450,.32],[768700,.35],[Infinity,.37]],
+        hoh:    [[17700,.10],[67450,.12],[105700,.22],[201750,.24],[256200,.32],[640600,.35],[Infinity,.37]],
+        mfs:    [[12400,.10],[50400,.12],[105700,.22],[201775,.24],[256225,.32],[384350,.35],[Infinity,.37]]
+      },
+      // Source: Rev. Proc. 2025-32 §4.14; IRS IR-2025-103 (Oct 9, 2025).
+      standardDeduction: { single:16100, mfj:32200, hoh:24150, mfs:16100 },
+      // Source: SSA 2026 fact sheet / OASDI wage base announcement (Oct 24, 2025).
+      ssWageBase: 184500,
+      // Statutory, not indexed: IRC §1401 (12.4% OASDI + 2.9% HI) and §1402(a)(12) (92.35%), $400 minimum.
+      ssRate: .124, medicareRate: .029, seFactor: .9235, seMinimum: 400,
+      // Statutory, not indexed: IRC §3101(b)(2) / §1401(b)(2). Employer withholds 0.9% above $200k wages.
+      addlMedicare: { rate:.009, threshold:{ single:200000, hoh:200000, mfj:250000, mfs:125000 }, employerThreshold:200000 },
+      // Source: Rev. Proc. 2025-32 §4.26 (threshold & phase-in end) and §2.12 ($400 minimum when QBI >= $1,000).
+      qbi: { rate:.20,
+             threshold:  { single:201750, hoh:201750, mfj:403500, mfs:201775 },
+             phaseInEnd: { single:276750, hoh:276750, mfj:553500, mfs:276775 },
+             minDeduction:400, minQbi:1000 },
+      // SALT cap under OBBBA: $40,400 for 2026, cut by 30% of MAGI over $505,000, floor $10,000 (halved for MFS).
+      // Source: IRC §164(b)(7) as amended by P.L. 119-21; amounts per Kiplinger / CPA summaries of 2026 figures (checked Oct 2026).
+      salt: { cap:40400, capMfs:20200, phaseoutStart:505000, phaseoutStartMfs:252500, phaseoutRate:.30, floor:10000, floorMfs:5000 },
+      // Child tax credit $2,200 per child under 17 (Rev. Proc. 2025-32 §4.05); $500 other-dependent credit;
+      // $50 reduction per $1,000 over $200k / $400k MFJ (statutory, not indexed). Treated as nonrefundable here.
+      childCredit: { perChild:2200, otherDependent:500, phaseoutStart:{ single:200000, hoh:200000, mfs:200000, mfj:400000 }, per1000:50 },
+      // OBBBA §70202 overtime deduction (2025–2028): $12,500 / $25,000 MFJ, minus $100 per $1,000 MAGI over $150k / $300k; MFS ineligible.
+      // Statutory figures from P.L. 119-21 — not re-verified against an IRS 2026 publication.
+      overtime: { cap:{ single:12500, hoh:12500, mfj:25000, mfs:0 }, phaseoutStart:{ single:150000, hoh:150000, mfj:300000, mfs:0 }, per1000:100 },
+      // OBBBA §70203 personal car-loan interest (new, US-assembled vehicle bought after 2024): up to $10,000,
+      // minus $200 per $1,000 MAGI over $100k / $200k MFJ. Statutory — not re-verified against an IRS 2026 publication.
+      carLoanInterest: { cap:10000, phaseoutStart:{ single:100000, hoh:100000, mfs:100000, mfj:200000 }, per1000:200 },
+      // OBBBA charitable rules starting 2026: non-itemizers deduct up to $1,000 / $2,000 MFJ of cash gifts;
+      // itemizers lose the first 0.5% of AGI. Statutory — not re-verified against an IRS 2026 publication.
+      charityNonItemizer: { single:1000, hoh:1000, mfs:1000, mfj:2000 }, charityFloorPct: .005,
+      // Business mileage: 72.5¢ Jan 1–Jun 30 (IRS IR-2025-128 / Notice 2026-10, Dec 29, 2025);
+      // 76¢ from Jul 1, 2026 (IRB 2026-29, reported by IFEBP Jul 14, 2026 — not read on irs.gov directly).
+      mileage: { h1:.725, h2:.76 },
+      // 401(k) elective deferral limit $24,500 (2026) + $8,000 age-50 catch-up.
+      // Limit confirmed via 2026 limits summary; catch-up amount not separately re-verified.
+      k401: { limit:24500, catchUp50:8000 },
+      // Estimated-tax safe harbor (IRC §6654, statutory): pay the smaller of 90% of this year or
+      // 100% of last year (110% if last year's AGI > $150k, $75k MFS). No penalty if under $1,000 owed.
+      safeHarbor: { currentPct:.90, priorPct:1.00, priorPctHigh:1.10, highAgi:150000, highAgiMfs:75000, minOwed:1000 },
+      // Form 1040-ES due dates for tax year 2026.
+      estDue: ["2026-04-15","2026-06-15","2026-09-15","2027-01-15"]
+    },
+    ohio: {
+      // Nonbusiness income: $0 tax up to $26,050, then $332 + 2.75% of the excess (flat for 2026).
+      // Source: ORC 5747.02 as amended by HB 96 (signed Jun 30, 2025); EY Tax News 2025-1441; Plante Moran (Jul 2025).
+      zeroBracket: 26050, baseTax: 332, rate: .0275,
+      // Business income: first $250,000 deducted ($125,000 MFS), remainder taxed at a flat 3%. Unchanged by HB 96.
+      businessRate: .03, bid: { single:250000, hoh:250000, mfj:250000, mfs:125000 },
+      // Personal/dependent exemption per person by Ohio MAGI: $2,400 (≤$40k), $2,150 (≤$80k), $1,900 (above);
+      // none at MAGI ≥ $500,000 for 2026. Source: ORC 5747.025; amounts via 2026 calculator summaries (indexing suspended).
+      exemptionTiers: [[40000,2400],[80000,2150],[Infinity,1900]], exemptionMagiCutoff: 500000,
+      // Ohio estimated payments: required if you'll owe more than $500; safe harbor 90% of current or 100% of prior year.
+      // From Ohio IT 1040ES instructions (general rule) — not re-verified for 2026.
+      safeHarbor: { currentPct:.90, priorPct:1.00, minOwed:500 },
+      estDue: ["2026-04-15","2026-06-15","2026-09-15","2027-01-15"]
+    }
+  }
+};
+
+(function(){
+"use strict";
+const KEY = "taxxray.v1";
+const STATUSES = [["single","Single"],["mfj","Married filing jointly"],["hoh","Head of household"],["mfs","Married filing separately"]];
+const DEFAULTS = { year:"2026", status:"single", salt_auto:true, itemize:false, sd_base:"trad", wi_401k:0, wi_biz_inc:0, wi_biz_exp:0 };
+
+/* ---------- input cards (declarative) ---------- */
+const CARDS = [
+  { id:"w2", title:"W-2 income", sub:"Paystub numbers, projected to Dec 31", open:true, fields:[
+    {html:`<div class="scanbox"><div class="t">Fill from your latest paystub</div><div class="note" style="margin-top:4px">Snap or pick a photo — the text is read on this phone, then you confirm each number before it's used.</div><div class="btns"><label class="btn primary" for="stubFile" role="button">Scan photo</label><button class="btn" type="button" data-act="scanpaste">Paste text</button></div></div>`},
+    ["w2_gross_ytd","Gross wages YTD","money"],
+    [["w2_gross_check","Gross per paycheck","money"],["w2_periods","Paychecks left this year","int"]],
+    ["w2_next_payday","Next payday (bi-weekly) — optional","date",{button:"Count"}],
+    {note:"Tap Count to fill “paychecks left” from your next payday, stepping 14 days to Dec 31."},
+    [["w2_401k_ytd","401(k) YTD","money"],["w2_401k_check","401(k) per check","money"]],
+    [["w2_pre_ytd","Other pre-tax YTD","money"],["w2_pre_check","Other pre-tax per check","money"]],
+    {note:"Other pre-tax = health, dental, vision, FSA or HSA through payroll. These skip FICA and city tax too; traditional 401(k) only skips income tax."},
+    {sub:"Withholding"},
+    [["w2_fwh_ytd","Federal YTD","money"],["w2_fwh_check","Federal per check","money"]],
+    [["w2_swh_ytd","Ohio YTD","money"],["w2_swh_check","Ohio per check","money"]],
+    [["w2_lwh_ytd","Local YTD (city + school)","money"],["w2_lwh_check","Local per check","money"]]
+  ]},
+  { id:"biz", title:"Photography business", sub:"Schedule C — sole proprietor", fields:[
+    [["biz_rcpt_ytd","Gross receipts YTD","money"],["biz_rcpt_rest","Expected receipts, rest of year","money"]],
+    [["biz_exp_ytd","Expenses YTD (simple total)","money"],["biz_exp_rest","Expected expenses, rest of year","money"]],
+    {sub:"Optional expense categories (YTD)"},
+    {note:"If any category or mileage is filled in, these replace the simple YTD total."},
+    [["biz_equip","Equipment","money"],["biz_soft","Software & subscriptions","money"]],
+    [["biz_print","Printing & products","money"],["biz_other","Other","money"]],
+    [["biz_mi_h1","Business miles Jan–Jun","int",{suffix:"mi"}],["biz_mi_h2","Business miles Jul–Dec","int",{suffix:"mi"}]],
+    {note:"__MILEAGE_NOTE__"}
+  ]},
+  { id:"oth", title:"Other income & adjustments", sub:"Interest, IRA, HSA, new 2025–2028 deductions", fields:[
+    [["int_div","Interest & dividends","money"],["oth_inc","Other taxable income","money"]],
+    [["ira","Deductible traditional IRA","money"],["hsa","HSA paid outside payroll","money"]],
+    [["ot_prem","Qualified overtime premium","money"],["car_int","New-car loan interest","money"]],
+    {note:"Overtime = only the extra “half” of time-and-a-half pay that's reported to you. Car interest = loan on a new, US-assembled personal vehicle bought after 2024. Both phase out at higher incomes."},
+    [["kids","Children under 17","int"],["deps","Other dependents","int"]]
+  ]},
+  { id:"ded", title:"Deductions", sub:"Standard unless you itemize", fields:[
+    ["itemize","Itemize instead of standard deduction","toggle"],
+    [["mort","Mortgage interest","money"],["prop","Property tax","money"]],
+    ["salt_auto","Auto-fill state & local income tax (withholding + estimates paid this year)","toggle"],
+    ["salt_manual","State & local income tax paid (if auto is off)","money"],
+    ["charity","Cash charitable gifts","money"],
+    {note:"SALT (state/local income + property tax) is capped. Non-itemizers can still deduct some cash gifts starting 2026; itemizers lose the first 0.5% of AGI."}
+  ]},
+  { id:"pay", title:"Payments & last year", sub:"Estimated payments and safe-harbor info", fields:[
+    {sub:"Federal estimated payments made"},
+    [["fq1","Q1 (Apr)","money"],["fq2","Q2 (Jun)","money"]],
+    [["fq3","Q3 (Sep)","money"],["fq4","Q4 (Jan)","money"]],
+    {sub:"Ohio estimated payments made"},
+    [["oq1","Q1 (Apr)","money"],["oq2","Q2 (Jun)","money"]],
+    [["oq3","Q3 (Sep)","money"],["oq4","Q4 (Jan)","money"]],
+    ["loc_est","Local estimated payments made","money"],
+    {sub:"Last year (for safe harbor)"},
+    [["prior_fed","Last year total federal tax","money"],["prior_agi","Last year AGI","money"]],
+    ["prior_oh","Last year Ohio tax","money"],
+    {note:"Total federal tax = Form 1040 “total tax” line (income tax + SE tax), not what you owed at filing."}
+  ]},
+  { id:"loc", title:"Local taxes", sub:"City and school district rates", fields:[
+    [["city_res","Home city rate","pct",{ph:"0.00"}],["city_work","Work city rate","pct",{ph:"0.00"}]],
+    ["city_credit","Home-city credit for work-city tax","pct",{ph:"0"}],
+    {note:"Live and work in the same city? Enter only the home rate. The credit % is from your home city's ordinance (e.g. 100 for full credit, 0 for none)."},
+    [["sd_rate","School district rate","pct",{ph:"0.00"}],["sd_base","School district base","select",{options:[["trad","Traditional"],["earned","Earned income"]]}]]
+  ]}
+];
+
+/* ---------- state ---------- */
+let S = Object.assign({}, DEFAULTS);
+function load(){
+  try { const raw = localStorage.getItem(KEY); if (raw){ const o = JSON.parse(raw); if (o && typeof o === "object") S = Object.assign({}, DEFAULTS, o); } } catch(e){}
+  if (!TAX_TABLES[S.year]) S.year = Object.keys(TAX_TABLES).slice(-1)[0];
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+function n(v){ if (typeof v === "number") return isFinite(v) ? v : 0; const x = parseFloat(String(v == null ? "" : v).replace(/[^0-9.\-]/g,"")); return isFinite(x) ? x : 0; }
+function esc(v){ return String(v == null ? "" : v).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function money(v){ const r = Math.round(v); return (r < 0 ? "−" : "") + "$" + Math.abs(r).toLocaleString("en-US"); }
+function money0(v){ return money(Math.max(0, v)); }
+function pct(v, d){ return (v * 100).toFixed(d == null ? 1 : d).replace(/\.0$/,"") + "%"; }
+function signed(v){ const r = Math.round(v); return r === 0 ? "no change" : (r > 0 ? "+" : "−") + "$" + Math.abs(r).toLocaleString("en-US"); }
+function pad(x){ return String(x).padStart(2,"0"); }
+function todayStr(){ const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); }
+function parseDate(s){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ""); return m ? new Date(+m[1], +m[2]-1, +m[3]) : null; }
+function fmtDate(s){ const d = parseDate(s); return d ? d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) : s; }
+function bracketTax(ti, br){ let tax = 0, prev = 0; for (const [lim, r] of br){ if (ti > prev) tax += (Math.min(ti, lim) - prev) * r; if (ti <= lim) break; prev = lim; } return tax; }
+function bracketRate(ti, br){ for (const [lim, r] of br){ if (ti <= lim) return r; } return br[br.length-1][1]; }
+function T(){ return TAX_TABLES[S.year] || TAX_TABLES[Object.keys(TAX_TABLES)[0]]; }
+
+/* =====================================================================
+   compute(state, opts) — the whole estimate. Pure function.
+   opts.whatIf: include slider values; opts.bumpWages / bumpBiz: marginal probes.
+   ===================================================================== */
+function compute(St, o){
+  o = o || {};
+  const TT = TAX_TABLES[St.year] || TAX_TABLES[Object.keys(TAX_TABLES)[0]];
+  const F = TT.federal, O = TT.ohio, st = St.status || "single", mfs = st === "mfs", mfj = st === "mfj";
+  const wi = o.whatIf ? { k:n(St.wi_401k), bi:n(St.wi_biz_inc), be:n(St.wi_biz_exp) } : { k:0, bi:0, be:0 };
+  const P = Math.max(0, Math.floor(n(St.w2_periods)));
+  const proj = (a, b) => n(St[a]) + n(St[b]) * P;
+
+  // ---- W-2 projection ----
+  const gross = proj("w2_gross_ytd","w2_gross_check") + (o.bumpWages || 0);
+  const k401 = proj("w2_401k_ytd","w2_401k_check") + wi.k;
+  const pre = proj("w2_pre_ytd","w2_pre_check");
+  const box1 = Math.max(0, gross - k401 - pre);          // federal & Ohio wages
+  const medWages = Math.max(0, gross - pre);             // FICA / city wages (401k still included)
+  const ssWages = Math.min(medWages, F.ssWageBase);
+  const fedWH = proj("w2_fwh_ytd","w2_fwh_check");
+  const ohWH = proj("w2_swh_ytd","w2_swh_check");
+  const locWH = proj("w2_lwh_ytd","w2_lwh_check");
+
+  // ---- Schedule C ----
+  const rcpt = n(St.biz_rcpt_ytd) + n(St.biz_rcpt_rest) + wi.bi + (o.bumpBiz || 0);
+  const mileage = n(St.biz_mi_h1) * F.mileage.h1 + n(St.biz_mi_h2) * F.mileage.h2;
+  const useCats = ["biz_equip","biz_soft","biz_print","biz_other","biz_mi_h1","biz_mi_h2"].some(k => n(St[k]) > 0);
+  const expYtd = useCats ? n(St.biz_equip) + n(St.biz_soft) + n(St.biz_print) + n(St.biz_other) + mileage : n(St.biz_exp_ytd);
+  const exp = expYtd + n(St.biz_exp_rest) + wi.be;
+  const net = rcpt - exp;
+
+  // ---- Self-employment tax (Schedule SE) ----
+  let seBase = net > 0 ? net * F.seFactor : 0;
+  if (seBase < F.seMinimum) seBase = 0;
+  const seSS = F.ssRate * Math.min(seBase, Math.max(0, F.ssWageBase - ssWages));
+  const seMed = F.medicareRate * seBase;
+  const seTax = seSS + seMed;
+  const halfSE = seTax / 2;
+  const am = F.addlMedicare, amThr = am.threshold[st];
+  const addlMed = am.rate * (Math.max(0, medWages - amThr) + Math.max(0, seBase - Math.max(0, amThr - medWages)));
+  const addlWH = am.rate * Math.max(0, medWages - am.employerThreshold);
+
+  // ---- AGI ----
+  const intDiv = n(St.int_div), oth = n(St.oth_inc), ira = n(St.ira), hsa = n(St.hsa);
+  const agi = box1 + net + intDiv + oth - halfSE - ira - hsa;
+  const magi = Math.max(0, agi);
+
+  // ---- Deductions ----
+  const std = F.standardDeduction[st];
+  const ohEstInYear = n(St.oq1) + n(St.oq2) + n(St.oq3);   // Q4 is paid in January of next year
+  const saltIncome = St.salt_auto ? ohWH + locWH + ohEstInYear + n(St.loc_est) : n(St.salt_manual);
+  const sc = F.salt;
+  const saltCap = Math.max(mfs ? sc.floorMfs : sc.floor, (mfs ? sc.capMfs : sc.cap) - sc.phaseoutRate * Math.max(0, magi - (mfs ? sc.phaseoutStartMfs : sc.phaseoutStart)));
+  const saltClaimed = saltIncome + n(St.prop);
+  const saltDed = Math.min(saltClaimed, saltCap);
+  const charity = n(St.charity);
+  const charityItem = Math.max(0, charity - F.charityFloorPct * magi);
+  const itemized = n(St.mort) + saltDed + charityItem;
+  const useItem = !!St.itemize;
+  const deduction = useItem ? itemized : std;
+  const charityStd = useItem ? 0 : Math.min(charity, F.charityNonItemizer[st]);
+  const ot = F.overtime;
+  const otDed = mfs ? 0 : Math.min(n(St.ot_prem), Math.max(0, ot.cap[st] - ot.per1000 * Math.max(0, magi - ot.phaseoutStart[st]) / 1000));
+  const cl = F.carLoanInterest;
+  const carDed = Math.min(n(St.car_int), Math.max(0, cl.cap - cl.per1000 * Math.max(0, magi - cl.phaseoutStart[st]) / 1000));
+  const tiPre = Math.max(0, agi - deduction - charityStd - otDed - carDed);
+
+  // ---- QBI (sole prop, no W-2 employees, not an SSTB) ----
+  const q = F.qbi, qbi = Math.max(0, net - halfSE);
+  let qbiDed = q.rate * qbi, qbiNote = "";
+  const qt = q.threshold[st], qe = q.phaseInEnd[st];
+  if (qbi > 0 && tiPre > qt){
+    if (tiPre >= qe){ qbiDed = 0; qbiNote = "over"; }
+    else { qbiDed *= 1 - (tiPre - qt) / (qe - qt); qbiNote = "phase"; }
+  }
+  if (qbi >= q.minQbi) qbiDed = Math.max(qbiDed, q.minDeduction);
+  qbiDed = Math.min(qbiDed, q.rate * tiPre);
+  const taxable = Math.max(0, tiPre - qbiDed);
+
+  // ---- Federal tax ----
+  const br = F.brackets[st];
+  const incTax = bracketTax(taxable, br);
+  const cc = F.childCredit;
+  const kids = Math.max(0, Math.floor(n(St.kids))), deps = Math.max(0, Math.floor(n(St.deps)));
+  const creditRaw = kids * cc.perChild + deps * cc.otherDependent;
+  const creditCut = cc.per1000 * Math.ceil(Math.max(0, magi - cc.phaseoutStart[st]) / 1000);
+  const credit = Math.min(incTax, Math.max(0, creditRaw - creditCut));
+  const fedIncTax = incTax - credit;
+  const fedTotal = fedIncTax + seTax + addlMed;
+  const fedEst = n(St.fq1) + n(St.fq2) + n(St.fq3) + n(St.fq4);
+  const fedPaid = fedWH + addlWH + fedEst;
+
+  // ---- Ohio ----
+  const ohAGI = agi;                                   // simplification: no Ohio additions/deductions
+  const bizInc = Math.max(0, net - halfSE);            // business income included in Ohio AGI
+  const bid = Math.min(bizInc, O.bid[st]);
+  const persons = (mfj ? 2 : 1) + kids + deps;
+  const ohMagi = Math.max(0, ohAGI);
+  let exEach = 0;
+  if (ohMagi < O.exemptionMagiCutoff){ for (const [lim, a] of O.exemptionTiers){ if (ohMagi <= lim){ exEach = a; break; } } }
+  const exTotal = persons * exEach;
+  const nonbiz = ohAGI - bizInc;
+  const nonbizTaxable = Math.max(0, nonbiz - exTotal);
+  const exLeft = Math.max(0, exTotal - Math.max(0, nonbiz));
+  const bizTaxable = Math.max(0, bizInc - bid - exLeft);
+  const ohNonbizTax = nonbizTaxable > O.zeroBracket ? O.baseTax + O.rate * (nonbizTaxable - O.zeroBracket) : 0;
+  const ohBizTax = O.businessRate * bizTaxable;
+  const ohTax = ohNonbizTax + ohBizTax;
+  const ohEst = n(St.oq1) + n(St.oq2) + n(St.oq3) + n(St.oq4);
+  const ohPaid = ohWH + ohEst;
+
+  // ---- Local ----
+  const rate = k => n(St[k]) / 100;
+  const rRes = rate("city_res"), rWork = rate("city_work"), credPct = Math.min(1, rate("city_credit"));
+  const netPos = Math.max(0, net);
+  const workTax = medWages * rWork;
+  const resCredit = credPct * Math.min(workTax, medWages * rRes);
+  const resTax = Math.max(0, (medWages + netPos) * rRes - resCredit);
+  const cityTax = workTax + resTax;
+  const sdBase = St.sd_base === "earned" ? medWages + netPos : Math.max(0, ohAGI - exTotal);
+  const sdTax = sdBase * rate("sd_rate");
+  const localTax = cityTax + sdTax;
+  const localPaid = locWH + n(St.loc_est);
+
+  const total = fedTotal + ohTax + localTax;
+  const income = Math.max(0, gross + net + intDiv + oth);
+  return {
+    P, gross, k401, pre, box1, medWages, fedWH, ohWH, locWH, addlWH,
+    rcpt, exp, expYtd, mileage, useCats, net, seBase, seSS, seMed, seTax, halfSE, addlMed,
+    agi, magi, std, itemized, saltClaimed, saltCap, saltDed, charityItem, charityStd, useItem, deduction, otDed, carDed,
+    tiPre, qbi, qbiDed, qbiNote, taxable, incTax, credit, fedIncTax, fedTotal, fedEst, fedPaid,
+    fedRate: taxable > 0 ? bracketRate(taxable, br) : 0,
+    bizInc, bid, persons, exEach, exTotal, nonbizTaxable, bizTaxable, ohNonbizTax, ohBizTax, ohTax, ohEst, ohPaid,
+    workTax, resTax, cityTax, sdBase, sdTax, localTax, localPaid,
+    total, income, eff: income > 0 ? total / income : 0,
+    fedBal: fedPaid - fedTotal, ohBal: ohPaid - ohTax, locBal: localPaid - localTax,
+    bal: (fedPaid - fedTotal) + (ohPaid - ohTax) + (localPaid - localTax),
+    hasData: gross > 0 || rcpt > 0 || intDiv > 0 || oth > 0
+  };
+}
+
+/* ---------- build inputs ---------- */
+function fieldHTML(f){
+  const id = f[0], label = f[1], type = f[2], opt = f[3] || {};
+  const v = S[id];
+  if (type === "toggle")
+    return `<label class="switch-row" for="${id}"><span>${label}</span><input type="checkbox" role="switch" id="${id}" data-k="${id}" ${v ? "checked" : ""}></label>`;
+  if (type === "select")
+    return `<label class="field"><span class="lbl">${label}</span><select id="${id}" data-k="${id}">${opt.options.map(([val,t]) => `<option value="${val}" ${v === val ? "selected" : ""}>${t}</option>`).join("")}</select></label>`;
+  if (type === "date")
+    return `<div class="field"><label class="lbl" for="${id}">${label}</label><div class="inline"><input type="date" id="${id}" data-k="${id}" value="${esc(v)}"><button type="button" class="btn" data-act="count">${opt.button}</button></div></div>`;
+  const im = type === "int" ? "numeric" : "decimal";
+  const preA = type === "money" ? `<span class="affix">$</span>` : "";
+  const suf = type === "pct" ? "%" : (opt.suffix || "");
+  const sufA = suf ? `<span class="affix suf">${suf}</span>` : "";
+  return `<label class="field"><span class="lbl">${label}</span><span class="inp${preA ? " has-pre" : ""}${sufA ? " has-suf" : ""}">${preA}<input type="text" inputmode="${im}" autocomplete="off" enterkeyhint="next" id="${id}" data-k="${id}" placeholder="${opt.ph || "0"}" value="${esc(v)}">${sufA}</span></label>`;
+}
+function buildInputs(){
+  const F = T().federal;
+  const mileNote = `Miles × IRS rate: ${(F.mileage.h1*100).toFixed(1)}¢ Jan–Jun, ${(F.mileage.h2*100).toFixed(1)}¢ Jul–Dec.`;
+  $("cards").innerHTML = CARDS.map(c => {
+    const body = c.fields.map(f => {
+      if (!Array.isArray(f) && f.html) return f.html;
+      if (!Array.isArray(f)) return f.note ? `<p class="note">${f.note === "__MILEAGE_NOTE__" ? mileNote : f.note}</p>` : `<h4 class="subhead">${f.sub}</h4>`;
+      if (Array.isArray(f[0])) return `<div class="row2">${f.map(fieldHTML).join("")}</div>`;
+      return fieldHTML(f);
+    }).join("");
+    return `<details class="card" id="card-${c.id}"${c.open ? " open" : ""}><summary><span><span class="ct">${c.title}</span><span class="cs" id="der-${c.id}">${c.sub}</span></span><svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></summary><div class="card-body">${body}</div></details>`;
+  }).join("");
+  $("year").innerHTML = Object.keys(TAX_TABLES).map(y => `<option value="${y}" ${S.year === y ? "selected" : ""}>${esc(TAX_TABLES[y].label || y)}</option>`).join("");
+  $("status").innerHTML = STATUSES.map(([v,t]) => `<option value="${v}" ${S.status === v ? "selected" : ""}>${t}</option>`).join("");
+  ["wi_401k","wi_biz_inc","wi_biz_exp"].forEach(k => { $(k).value = n(S[k]); });
+}
+
+/* ---------- render ---------- */
+const COLORS = { fed:"#3CC79A", se:"#5AA9E6", oh:"#9B8CE8", loc:"#7A828D" };
+function jurRow(name, det, bal){
+  const owe = bal < -0.5;
+  return `<div class="jur"><div><div class="name">${name}</div><div class="det">${det}</div></div><div class="amt ${owe ? "amber" : "mint"}">${money(Math.abs(bal))}<br><span class="tag ${owe ? "warn" : "ok"}">${owe ? "owe" : "refund"}</span></div></div>`;
+}
+function line(a, b, cls){ return `<div class="line${cls ? " " + cls : ""}"><span>${a}</span><span>${b}</span></div>`; }
+
+function render(){
+  const r = compute(S), rw = compute(S, { whatIf:true });
+  const F = T().federal, st = S.status;
+  $("yearChip").textContent = S.year + " estimate";
+  $("totalLabel").textContent = "Projected " + S.year + " total tax";
+
+  // card subtitles
+  const set = (id, txt) => { const el = $("der-" + id); if (el) el.textContent = txt; };
+  const c = CARDS.reduce((m, x) => (m[x.id] = x.sub, m), {});
+  set("w2", r.gross > 0 ? `Full year ${money(r.gross)} · taxable ${money(r.box1)} · fed WH ${money(r.fedWH)}` : c.w2);
+  set("biz", r.rcpt || r.exp ? `Net profit ${money(r.net)}${r.useCats ? " · using categories" : ""}${r.mileage ? " · mileage " + money(r.mileage) : ""}` : c.biz);
+  set("ded", `${r.useItem ? "Itemizing" : "Standard"} · itemized ${money(r.itemized)} vs standard ${money(r.std)}`);
+  set("pay", (r.fedEst || r.ohEst) ? `Federal est. ${money(r.fedEst)} · Ohio est. ${money(r.ohEst)}` : c.pay);
+  set("loc", (r.cityTax || r.sdTax) ? `City ${money(r.cityTax)} · school ${money(r.sdTax)}` : c.loc);
+  set("oth", (r.agi && (n(S.int_div)||n(S.oth_inc)||n(S.ira)||n(S.hsa)||r.otDed||r.carDed||n(S.kids)||n(S.deps))) ? `AGI ${money(r.agi)}` : c.oth);
+
+  $("emptyState").hidden = r.hasData;
+  $("summaryBody").hidden = !r.hasData;
+
+  // headline
+  $("sTotal").textContent = money0(r.total);
+  $("sEff").textContent = pct(r.eff);
+  $("sMarg").textContent = pct(r.fedRate, 0);
+  const mW = (compute(S, { bumpWages:1000 }).total - r.total) / 1000;
+  const mB = (compute(S, { bumpBiz:1000 }).total - r.total) / 1000;
+  $("sMargSub").textContent = `All-in: ${pct(mW,0)} next $ of wages · ${pct(mB,0)} next $ of business`;
+
+  // balance banner
+  $("balanceBanner").innerHTML = r.bal >= -0.5
+    ? `<div class="banner ok">Projected refund<span class="big">${money(r.bal)}</span><span class="sm">Federal, Ohio and local combined</span></div>`
+    : `<div class="banner warn">Projected to owe<span class="big">${money(-r.bal)}</span><span class="sm">Federal, Ohio and local combined — see Planner</span></div>`;
+
+  $("jurisdictions").innerHTML = `<div class="eyebrow" style="margin-bottom:6px">By return</div>` +
+    jurRow("Federal", `Tax ${money(r.fedTotal)} · paid ${money(r.fedPaid)}`, r.fedBal) +
+    jurRow("Ohio", `Tax ${money(r.ohTax)} · paid ${money(r.ohPaid)}`, r.ohBal) +
+    jurRow("Local", `Tax ${money(r.localTax)} · paid ${money(r.localPaid)}`, r.locBal);
+
+  // breakdown bar
+  const segs = [["Federal income tax", r.fedIncTax, COLORS.fed], ["Self-employment & extra Medicare", r.seTax + r.addlMed, COLORS.se], ["Ohio income tax", r.ohTax, COLORS.oh], ["City & school district", r.localTax, COLORS.loc]];
+  const tot = segs.reduce((s, x) => s + Math.max(0, x[1]), 0) || 1;
+  let x = 0, rects = "";
+  segs.forEach(([, v, col]) => { const w = Math.max(0, v) / tot * 100; if (w > 0){ rects += `<rect x="${x}" y="0" width="${w}" height="10" fill="${col}"/>`; x += w; } });
+  $("bar").innerHTML = `<defs><clipPath id="rc"><rect x="0" y="0" width="100" height="10" rx="1.6" ry="5"/></clipPath></defs><rect x="0" y="0" width="100" height="10" fill="#171A1F"/><g clip-path="url(#rc)">${rects}</g>`;
+  $("legend").innerHTML = segs.map(([lab, v, col]) => `<li><span class="dot" style="background:${col}"></span><span class="lab">${lab}</span><span class="v">${money0(v)}</span><span class="p">${pct(Math.max(0,v)/tot,0)}</span></li>`).join("");
+
+  // warnings
+  const W = [];
+  const kLimit = F.k401.limit + F.k401.catchUp50;
+  if (r.qbiNote === "phase") W.push(`<div class="banner warn">QBI deduction is phasing out<span class="sm">Taxable income is above ${money(F.qbi.threshold[st])}. With no employees or business property, the 20% deduction shrinks to zero by ${money(F.qbi.phaseInEnd[st])}. This estimate applies that phase-out.</span></div>`);
+  if (r.qbiNote === "over") W.push(`<div class="banner warn">Over the QBI income limit<span class="sm">Taxable income is above ${money(F.qbi.phaseInEnd[st])}, so the 20% QBI deduction is limited to the minimum. Wages paid or business property could change this.</span></div>`);
+  if (r.k401 - n(S.wi_401k) > kLimit) W.push(`<div class="banner warn">401(k) projection is over the limit<span class="sm">Projected ${money(r.k401 - n(S.wi_401k))} vs ${money(kLimit)} (${S.year} limit including age-50 catch-up). Check your per-check amount or paychecks left.</span></div>`);
+  if (r.net < 0) W.push(`<div class="info">The business shows a ${money(-r.net)} loss. It offsets other income here; no SE tax or QBI deduction applies.</div>`);
+  if (r.gross > 0 && !n(S.city_res) && !n(S.city_work) && !n(S.sd_rate)) W.push(`<div class="info">No city or school district rates entered yet — local tax shows $0. Add them under Inputs → Local taxes.</div>`);
+  $("warnings").innerHTML = W.join("");
+
+  // what-if
+  const baseK = r.k401;
+  const room = Math.max(0, kLimit - baseK);
+  const kMax = Math.max(1000, Math.ceil(room / 250) * 250);
+  const ks = $("wi_401k"); ks.max = kMax; if (n(S.wi_401k) > kMax){ S.wi_401k = kMax; ks.value = kMax; }
+  $("wiKVal").textContent = money(n(S.wi_401k));
+  $("wiKHint").textContent = `Room left: ${money(room)} (${money(F.k401.limit)} + ${money(F.k401.catchUp50)} catch-up at 50+). Spread over ${r.P || 0} paycheck${r.P === 1 ? "" : "s"}: ${r.P ? money(n(S.wi_401k) / r.P) + " each" : "—"}. Catch-up for higher earners may have to be Roth, which wouldn't cut tax.`;
+  $("wiBIVal").textContent = money(n(S.wi_biz_inc));
+  $("wiBEVal").textContent = money(n(S.wi_biz_exp));
+  $("wiTotal").textContent = money0(rw.total);
+  const dT = rw.total - r.total;
+  $("wiTotalD").innerHTML = dT === 0 || Math.round(dT) === 0 ? "no change" : `<span class="${dT < 0 ? "mint" : "amber"}">${signed(dT)}</span> vs now`;
+  $("wiBalLbl").textContent = rw.bal >= -0.5 ? "Refund" : "Owe";
+  $("wiBal").textContent = money(Math.abs(rw.bal));
+  $("wiBal").className = "stat " + (rw.bal >= -0.5 ? "mint" : "amber");
+  const dB = rw.bal - r.bal;
+  $("wiBalD").innerHTML = Math.round(dB) === 0 ? "no change" : `<span class="${dB > 0 ? "mint" : "amber"}">${signed(dB)}</span> cash at filing`;
+
+  // line-by-line
+  const L = [];
+  L.push(line("Gross W-2 wages (projected)", money(r.gross), "h"));
+  L.push(line(`<span class="muted">Paychecks left × per-check</span>`, String(r.P)));
+  L.push(line("− 401(k) and pre-tax", money(r.k401 + r.pre)));
+  L.push(line("Federal wages (Box 1)", money(r.box1)));
+  L.push(line("Business receipts", money(r.rcpt), "h"));
+  L.push(line("− Business expenses", money(r.exp)));
+  L.push(line("Net profit (Schedule C)", money(r.net)));
+  L.push(line("+ Interest, dividends, other", money(n(S.int_div) + n(S.oth_inc))));
+  L.push(line("− Half of SE tax", money(r.halfSE)));
+  L.push(line("− IRA / HSA", money(n(S.ira) + n(S.hsa))));
+  L.push(line("Adjusted gross income", money(r.agi), "h"));
+  L.push(line(`− ${r.useItem ? "Itemized" : "Standard"} deduction`, money(r.deduction)));
+  if (r.useItem) L.push(line(`<span class="muted">SALT ${money(r.saltClaimed)} claimed, cap ${money(r.saltCap)}</span>`, money(r.saltDed)));
+  if (r.charityStd) L.push(line("− Charity (non-itemizer)", money(r.charityStd)));
+  if (r.otDed) L.push(line("− Overtime deduction", money(r.otDed)));
+  if (r.carDed) L.push(line("− Car-loan interest deduction", money(r.carDed)));
+  L.push(line("− QBI deduction (20%)", money(r.qbiDed)));
+  L.push(line("Taxable income", money(r.taxable), "h"));
+  L.push(line("Income tax from brackets", money(r.incTax)));
+  if (r.credit) L.push(line("− Child / dependent credit", money(r.credit)));
+  L.push(line(`SE tax <span class="muted">(SS ${money(r.seSS)} + Medicare ${money(r.seMed)})</span>`, money(r.seTax)));
+  if (r.addlMed) L.push(line("Additional Medicare 0.9%", money(r.addlMed)));
+  L.push(line("Total federal tax", money(r.fedTotal), "h"));
+  L.push(line(`<span class="muted">Paid: withholding ${money(r.fedWH)}${r.addlWH ? " + Medicare WH " + money(r.addlWH) : ""} + estimates ${money(r.fedEst)}</span>`, money(r.fedPaid)));
+  L.push(line("Ohio AGI", money(r.agi), "h"));
+  L.push(line(`− Exemptions (${r.persons} × ${money(r.exEach)})`, money(r.exTotal)));
+  L.push(line("Nonbusiness taxable", money(r.nonbizTaxable)));
+  L.push(line(`<span class="muted">$0 to $26,050, then $332 + 2.75%</span>`, money(r.ohNonbizTax)));
+  L.push(line(`Business income ${money(r.bizInc)} − deduction ${money(r.bid)}`, money(r.bizTaxable)));
+  L.push(line(`<span class="muted">Business rate 3%</span>`, money(r.ohBizTax)));
+  L.push(line("Total Ohio tax", money(r.ohTax), "h"));
+  L.push(line("City tax (work + home)", money(r.cityTax), "h"));
+  L.push(line(`<span class="muted">Work ${money(r.workTax)} · home ${money(r.resTax)}</span>`, ""));
+  L.push(line(`School district (${S.sd_base === "earned" ? "earned" : "traditional"} base ${money(r.sdBase)})`, money(r.sdTax)));
+  L.push(`<p class="note" style="margin-top:14px">Simplified: qualified dividends taxed as ordinary income; no AMT, ACA credit, refundable child credit, Ohio credits (joint filing, retirement) or Ohio add-backs; city tax assumes business net profit is taxed by your home city; school district traditional base = Ohio AGI − exemptions.</p>`);
+  $("lines").innerHTML = L.join("");
+
+  renderPlanner(r);
+}
+
+function quarterRows(due, paidKeys, perQ, today){
+  let nextFound = false;
+  return due.map((d, i) => {
+    const past = d < today;
+    let cls = past ? "past" : "";
+    if (!past && !nextFound){ cls = "next"; nextFound = true; }
+    const paid = n(S[paidKeys[i]]);
+    const sug = past ? "—" : (perQ > 0 ? money(perQ) : "$0");
+    return `<tr class="${cls}"><td class="due">Q${i+1}<small>${fmtDate(d)}${cls === "next" ? " · next" : ""}</small></td><td>${paid ? money(paid) : "—"}</td><td>${sug}</td></tr>`;
+  }).join("");
+}
+
+function renderPlanner(r){
+  const TT = T(), F = TT.federal, O = TT.ohio, st = S.status, today = todayStr();
+  if (!r.hasData){ $("planBody").innerHTML = `<div class="panel"><div class="eyebrow">Planner</div><p class="muted">Add your numbers under Inputs to see safe-harbor status and quarterly payments.</p></div>`; return; }
+
+  // federal safe harbor
+  const sh = F.safeHarbor;
+  const priorSet = S.prior_fed !== "" && S.prior_fed != null;
+  const high = n(S.prior_agi) > (st === "mfs" ? sh.highAgiMfs : sh.highAgi);
+  const priorReq = priorSet ? n(S.prior_fed) * (high ? sh.priorPctHigh : sh.priorPct) : Infinity;
+  const curReq = sh.currentPct * r.fedTotal;
+  const fReq = Math.min(curReq, priorReq);
+  const fShort = Math.max(0, fReq - r.fedPaid);
+  const fOwe = r.fedTotal - r.fedPaid;
+  const fSafe = fShort <= 0.5 || fOwe < sh.minOwed;
+  const fRemain = F.estDue.filter(d => d >= today).length;
+
+  // Ohio safe harbor
+  const osh = O.safeHarbor;
+  const ohPriorSet = S.prior_oh !== "" && S.prior_oh != null;
+  const oReq = Math.min(osh.currentPct * r.ohTax, ohPriorSet ? n(S.prior_oh) * osh.priorPct : Infinity);
+  const oShort = Math.max(0, oReq - r.ohPaid);
+  const oOwe = r.ohTax - r.ohPaid;
+  const oSafe = oShort <= 0.5 || oOwe <= osh.minOwed;
+  const oRemain = O.estDue.filter(d => d >= today).length;
+
+  const chk = (ok, na, text) => `<div class="checkrow"><span class="ic ${na ? "na" : ok ? "ok" : "no"}">${na ? "?" : ok ? "✓" : "!"}</span><span>${text}</span></div>`;
+  const perCheck = (amt) => r.P > 0 ? `${money(amt / r.P)} extra per paycheck` : "—";
+
+  const fedPanel = `
+  <div class="${fSafe ? "banner ok" : "banner warn"}">Federal: ${fSafe ? "on track for safe harbor" : "short of safe harbor"}<span class="big">${fSafe ? money(Math.max(0, fOwe)) + (fOwe > 0 ? " due at filing" : "") : money(fShort) + " to go"}</span><span class="sm">${fSafe ? (fOwe > 0 ? "No underpayment penalty expected; you'd still pay this balance in April." : "Projected refund of " + money(-fOwe) + ".") : "Pay this by the next due date or through extra withholding to avoid an underpayment penalty."}</span></div>
+  <div class="panel">
+    <div class="eyebrow">Federal safe-harbor check</div>
+    ${chk(r.fedPaid >= curReq, false, `90% of this year's tax: <b>${money(curReq)}</b> — projected payments ${money(r.fedPaid)}`)}
+    ${chk(priorSet && r.fedPaid >= priorReq, !priorSet, priorSet ? `${high ? "110" : "100"}% of last year's tax: <b>${money(priorReq)}</b>${high ? " (last year's AGI was over " + money(st === "mfs" ? sh.highAgiMfs : sh.highAgi) + ")" : ""}` : `Enter last year's total tax under Inputs → Payments to check the prior-year safe harbor`)}
+    ${chk(fOwe < sh.minOwed, false, `Owe less than ${money(sh.minOwed)} at filing: projected ${fOwe > 0 ? money(fOwe) + " owed" : "refund"}`)}
+    <p class="note">Required: <b>${money(fReq)}</b> (the smaller test). Extra W-4 withholding counts as paid evenly all year, so it can still fix earlier quarters; a late estimated payment can't.</p>
+    <div class="row2" style="margin-top:10px">
+      <div class="info" style="margin:0"><div class="eyebrow">Via withholding</div><div class="stat" style="font-size:20px">${fShort > 0 ? perCheck(fShort).split(" extra")[0] : "$0"}</div><div class="sub">extra per paycheck${r.P ? " × " + r.P : ""}</div></div>
+      <div class="info" style="margin:0"><div class="eyebrow">To owe $0</div><div class="stat" style="font-size:20px">${fOwe > 0 && r.P ? money(fOwe / r.P) : "$0"}</div><div class="sub">extra per paycheck</div></div>
+    </div>
+  </div>`;
+
+  const fPerQ = fRemain ? fShort / fRemain : 0;
+  const oPerQ = oRemain ? oShort / oRemain : 0;
+  const qPanel = (title, due, keys, perQ, remain, short, owe) => `
+  <div class="panel">
+    <div class="eyebrow">${title} quarterly planner</div>
+    <table class="q"><thead><tr><th>Due</th><th>Paid</th><th>Suggested</th></tr></thead><tbody>${quarterRows(due, keys, perQ, today)}</tbody></table>
+    <p class="note">${remain ? `Suggested = safe-harbor shortfall ${money(short)} split over ${remain} remaining due date${remain === 1 ? "" : "s"}.${owe > 0 ? " To owe nothing at filing instead: " + money(owe / remain) + " each." : ""}` : "All due dates for this tax year have passed."}</p>
+  </div>`;
+
+  const ohPanel = `
+  <div class="${oSafe ? "banner ok" : "banner warn"}">Ohio: ${oSafe ? "on track" : "short of safe harbor"}<span class="big">${oSafe ? (oOwe > 0 ? money(oOwe) + " due at filing" : "Refund " + money(-oOwe)) : money(oShort) + " to go"}</span><span class="sm">Safe harbor: 90% of this year (${money(osh.currentPct * r.ohTax)})${ohPriorSet ? " or 100% of last year (" + money(n(S.prior_oh)) + ")" : ""}; no estimates needed if you'll owe ${money(osh.minOwed)} or less.${oShort > 0 && r.P ? " Or about " + money(oShort / r.P) + " extra Ohio withholding per paycheck." : ""}</span></div>`;
+
+  const locNote = r.locBal < -0.5 ? `<div class="info">Local: projected ${money(-r.locBal)} owed. Many Ohio cities want quarterly declarations when you have business income — check with your city's tax office.</div>` : "";
+
+  $("planBody").innerHTML = fedPanel + qPanel("Federal", F.estDue, ["fq1","fq2","fq3","fq4"], fPerQ, fRemain, fShort, Math.max(0, fOwe)) + ohPanel + qPanel("Ohio", O.estDue, ["oq1","oq2","oq3","oq4"], oPerQ, oRemain, oShort, Math.max(0, oOwe)) + locNote;
+}
+
+/* =====================================================================
+   PAYSTUB SCAN — on-device OCR (Tesseract.js, loaded only when you tap
+   Scan photo) + a label-based parser. The photo is never uploaded: the
+   CDN serves the reading engine and English model (~5 MB, cached by the
+   browser after the first scan). "Paste text" needs no download at all.
+   ===================================================================== */
+const OCR = {
+  lib:  "https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js",
+  worker:"https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/worker.min.js",
+  core: "https://cdn.jsdelivr.net/npm/tesseract.js-core@7.0.0",
+  lang: "https://cdn.jsdelivr.net/npm/@tesseract.js-data/eng@1.0.0/4.0.0_best_int"
+};
+// Each paystub row we look for. `inc` must match the line, `exc` must not.
+// sum:true adds every matching line (e.g. two 401(k) lines, city + school).
+const STUB_FIELDS = [
+  { key:"gross", label:"Gross pay",          cur:"w2_gross_check", ytd:"w2_gross_ytd",
+    inc:/\bgross\b/i, exc:/\bnet\b|federal taxable|fed taxable|taxable wages/i },
+  { key:"fwh",   label:"Federal withholding", cur:"w2_fwh_check",   ytd:"w2_fwh_ytd",
+    inc:/\bfed(?:eral)?\.?\s*(?:inc(?:ome)?\.?\s*)?(?:tax|w\/?h|withh?olding|wh|fit)\b|\bfitw?\b|\bfwt\b|\bfed\s*w\/?h\b/i,
+    exc:/medicare|social|oasdi|fica|\bmed\b|state|taxable|gross/i },
+  { key:"swh",   label:"Ohio withholding",    cur:"w2_swh_check",   ytd:"w2_swh_ytd",
+    inc:/\bohio\b|\boh\b|\bstate\b|\bsitw?\b|\bswt\b/i,
+    exc:/school|\bsd\b|sdit|city|local|muni|federal|\bfed\b|medicare|social|oasdi|taxable|gross|unemploy|\bsui\b|disab/i },
+  { key:"lwh",   label:"Local withholding (city + school)", cur:"w2_lwh_check", ytd:"w2_lwh_ytd", sum:true,
+    inc:/\bcity\b|\blocal\b|\bmuni|\bschool\b|\bsd\b|sdit|montpelier|bryan|\brita\b|\bcca\b|\blit\b/i,
+    exc:/gross|\bnet\b|taxable/i },
+  { key:"k401",  label:"401(k) deferral",     cur:"w2_401k_check",  ytd:"w2_401k_ytd", sum:true,
+    inc:/401\s*\(?\s*k/i, exc:/roth|match|employer|\ber\b|co\.?\s*contr|loan|after[-\s]?tax/i },
+  { key:"pre",   label:"Other pre-tax (health, dental, HSA…)", cur:"w2_pre_check", ytd:"w2_pre_ytd", sum:true,
+    inc:/medical|dental|vision|health|\bmed\b|\bhsa\b|\bfsa\b|sec(?:tion)?\s*125|cafeteria|\bdep(?:endent)?\s*care/i,
+    exc:/medicare|employer|\ber\b|imputed|taxable|life|disab|\bstd\b|\bltd\b|gross|\bnet\b|after[-\s]?tax/i }
+];
+
+function stubNumbers(line){
+  let s = line
+    .replace(/\b\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}\b/g, " ")      // dates
+    .replace(/\b\d+(?:\.\d+)?\s*%/g, " ")                         // percentages
+    .replace(/(\d)\s*,\s*(\d{3})/g, "$1,$2")                       // "3, 600.00" → "3,600.00"
+    .replace(/\b(\d{1,3}(?:\.\d{3})+)\.(\d{2})\b/g, (m, a, b) => a.replace(/\./g, "") + "." + b) // "3.600.00"
+    .replace(/(\d)\s+\.(\d{2})\b/g, "$1.$2");                     // "3600 .00"
+  const out = [];
+  const re = /(\(?-?\$?\s?)(\d{1,3}(?:,\d{3})+(?:\.\d{2})?|\d+\.\d{2})(\)?)/g;
+  let m; while ((m = re.exec(s))) out.push(parseFloat(m[2].replace(/,/g, "")));
+  return out;
+}
+function parseStub(text){
+  const lines = String(text || "").split(/\r?\n/).map(l => l.replace(/\s+/g, " ").trim()).filter(Boolean);
+  const res = {};
+  STUB_FIELDS.forEach(f => {
+    const hits = [];
+    lines.forEach(l => {
+      if (!f.inc.test(l) || f.exc.test(l)) return;
+      const nums = stubNumbers(l); if (!nums.length) return;
+      hits.push({ line:l, cur: nums.length >= 2 ? nums[nums.length-2] : nums[0], ytd: nums.length >= 2 ? nums[nums.length-1] : null });
+    });
+    if (!hits.length) { res[f.key] = null; return; }
+    let use;
+    if (f.sum) use = hits;
+    else if (f.key === "gross") use = [hits.find(h => /total/i.test(h.line) && h.ytd != null) || hits.find(h => h.ytd != null) || hits[0]];
+    else use = [hits.find(h => h.ytd != null) || hits[0]];
+    res[f.key] = {
+      cur: use.reduce((a, h) => a + (h.cur || 0), 0),
+      ytd: use.some(h => h.ytd != null) ? use.reduce((a, h) => a + (h.ytd || 0), 0) : null,
+      lines: use.map(h => h.line)
+    };
+  });
+  // pay / check date → next bi-weekly payday
+  let pay = null;
+  const dm = /(?:pay|check|advice|deposit)\s*date\D{0,6}(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})/i.exec(text)
+          || /(?:pay|check|advice|deposit)\s*date\D{0,6}([A-Za-z]{3,9})\.?\s+(\d{1,2}),?\s+(\d{4})/i.exec(text);
+  if (dm){
+    let y, mo, d;
+    if (/^\d/.test(dm[1])){ mo = +dm[1]; d = +dm[2]; y = +dm[3]; if (y < 100) y += 2000; }
+    else { mo = new Date(dm[1] + " 1, 2000").getMonth() + 1; d = +dm[2]; y = +dm[3]; }
+    if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31 && y > 2000) pay = `${y}-${pad(mo)}-${pad(d)}`;
+  }
+  res.payDate = pay;
+  res.lineCount = lines.length;
+  return res;
+}
+function addDays(s, k){ const d = parseDate(s); if (!d) return ""; d.setDate(d.getDate() + k); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function countPaychecks(nextStr, year){
+  const d = parseDate(nextStr); if (!d) return null;
+  const end = new Date(+year, 11, 31); let c = 0;
+  for (const t = new Date(d); t <= end; t.setDate(t.getDate() + 14)) c++;
+  return c;
+}
+
+let SCAN = { parsed:null, raw:"", thumb:"" };
+let tessP = null;
+function loadTesseract(){
+  if (window.Tesseract) return Promise.resolve(window.Tesseract);
+  if (tessP) return tessP;
+  tessP = new Promise((ok, bad) => {
+    const s = document.createElement("script"); s.src = OCR.lib; s.async = true;
+    s.onload = () => window.Tesseract ? ok(window.Tesseract) : bad(new Error("no lib"));
+    s.onerror = () => { tessP = null; bad(new Error("load failed")); };
+    document.head.appendChild(s);
+  });
+  return tessP;
+}
+function prepImage(file){
+  return new Promise((ok, bad) => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const long = Math.max(img.naturalWidth, img.naturalHeight);
+      const scale = long > 2600 ? 2600 / long : (long < 1400 ? 1400 / long : 1);
+      const w = Math.round(img.naturalWidth * scale), h = Math.round(img.naturalHeight * scale);
+      const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+      const cx = cv.getContext("2d"); cx.drawImage(img, 0, 0, w, h);
+      // grayscale + gentle contrast stretch helps with phone photos
+      const id = cx.getImageData(0, 0, w, h), px = id.data;
+      let lo = 255, hi = 0;
+      for (let i = 0; i < px.length; i += 16){ const g = px[i]*.299 + px[i+1]*.587 + px[i+2]*.114; if (g < lo) lo = g; if (g > hi) hi = g; }
+      const span = Math.max(40, hi - lo);
+      for (let i = 0; i < px.length; i += 4){
+        let g = (px[i]*.299 + px[i+1]*.587 + px[i+2]*.114 - lo) * 255 / span;
+        g = g < 0 ? 0 : g > 255 ? 255 : g; px[i] = px[i+1] = px[i+2] = g;
+      }
+      cx.putImageData(id, 0, 0);
+      const tc = document.createElement("canvas"), ts = 360 / Math.max(w, h);
+      tc.width = Math.round(w * ts); tc.height = Math.round(h * ts); tc.getContext("2d").drawImage(cv, 0, 0, tc.width, tc.height);
+      URL.revokeObjectURL(url);
+      ok({ canvas: cv, thumb: tc.toDataURL("image/jpeg", .7) });
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); bad(new Error("image")); };
+    img.src = url;
+  });
+}
+function openSheet(html){ $("scanBody").innerHTML = html; $("scanSheet").hidden = false; document.body.style.overflow = "hidden"; }
+function closeSheet(){ $("scanSheet").hidden = true; document.body.style.overflow = ""; }
+function progressHTML(msg, p){
+  return `${SCAN.thumb ? `<img class="thumb" src="${SCAN.thumb}" alt="Paystub photo">` : ""}
+    <div class="prog"><i style="width:${Math.round((p||0)*100)}%"></i></div>
+    <div class="note" id="scanMsg">${esc(msg)}</div>`;
+}
+function setProgress(msg, p){ const i = document.querySelector("#scanBody .prog i"); if (i) i.style.width = Math.round((p||0)*100) + "%"; const m = $("scanMsg"); if (m) m.textContent = msg; }
+const pasteHint = `On iPhone: open the paystub photo or PDF, press and hold on the text, tap <b>Select All</b>, then <b>Copy</b> and paste here. Nothing is downloaded this way.`;
+function pasteHTML(prefill, warn){
+  return `${warn ? `<div class="banner warn" style="margin-top:4px">${warn}</div>` : ""}
+    <p class="note">${pasteHint}</p>
+    <textarea id="stubText" placeholder="Paste paystub text…" spellcheck="false" autocapitalize="off">${esc(prefill || "")}</textarea>
+    <div class="btns"><button class="btn primary full" type="button" data-act="scanread">Read numbers</button></div>`;
+}
+function withTimeout(p, ms, what){
+  return Promise.race([p, new Promise((_, bad) => setTimeout(() => bad(new Error(what + " timed out after " + Math.round(ms/1000) + "s")), ms))]);
+}
+function failHTML(title, stage, err){
+  const local = !/^https?:$/.test(location.protocol);
+  const why = local
+    ? "This copy is running as a local file or inside a preview, which blocks the text reader. Open the app from your GitHub Pages link (or your home-screen icon) and try again."
+    : "Check that you're online for the first scan (the reader downloads once, then works offline), and try again. If it keeps failing, Paste text below always works.";
+  return `<div class="banner warn" style="margin-top:4px">${esc(title)}<span class="sm">${why}</span></div>
+    <div class="errd">Step: ${esc(stage)}<br>Detail: ${esc(err && (err.message || err) || "unknown")}<br>Page: ${esc(location.protocol)} · ${esc(navigator.userAgent.replace(/^Mozilla\/5\.0 /, "").slice(0, 120))}</div>
+    <div class="btns"><label class="btn primary full" for="stubFile" role="button">Try another photo</label></div>
+    <h4 class="subhead">Or paste the text</h4>` + pasteHTML("", "");
+}
+async function runOCR(file){
+  SCAN = { parsed:null, raw:"", thumb:"" };
+  openSheet(progressHTML("Preparing photo…", .02));
+  let prepped, stage = "opening the photo";
+  try { prepped = await withTimeout(prepImage(file), 30000, "Opening the photo"); }
+  catch(e){ openSheet(failHTML("Couldn't open that photo", stage + " (" + (file.type || "unknown type") + ", " + Math.round(file.size/1024) + " KB)", e)); return; }
+  SCAN.thumb = prepped.thumb;
+  openSheet(progressHTML("Loading the text reader (first time only)…", .05));
+  let worker;
+  try {
+    stage = "downloading the text reader";
+    const Tess = await withTimeout(loadTesseract(), 45000, "Downloading the reader");
+    stage = "starting the text reader";
+    worker = await withTimeout(Tess.createWorker("eng", 1, {
+      workerPath: OCR.worker, corePath: OCR.core, langPath: OCR.lang,
+      logger: m => {
+        if (m.status === "recognizing text") setProgress("Reading text… " + Math.round(m.progress*100) + "%", .35 + m.progress * .65);
+        else if (/load|initializ/i.test(m.status || "")) setProgress("Loading the text reader (first time only)…", .05 + (m.progress || 0) * .3);
+      },
+      errorHandler: () => {}
+    }), 120000, "Starting the reader");
+    stage = "reading the text";
+    await worker.setParameters({ preserve_interword_spaces: "1" });
+    const out = await withTimeout(worker.recognize(prepped.canvas), 120000, "Reading the text");
+    SCAN.raw = (out && out.data && out.data.text) || "";
+  } catch(e){
+    if (worker) try { await worker.terminate(); } catch(_){}
+    openSheet(failHTML("Scan stopped while " + stage, stage, e));
+    return;
+  }
+  if (!SCAN.raw.trim()){ try { await worker.terminate(); } catch(_){}
+    openSheet(failHTML("No text found in that photo", "reading the text", "OCR returned no text — try a sharper, straight-on photo with the stub filling the frame")); return; }
+  try { await worker.terminate(); } catch(_){}
+  showReview(SCAN.raw);
+}
+function showReview(text){
+  SCAN.raw = text;
+  const P = parseStub(text);
+  SCAN.parsed = P;
+  const found = STUB_FIELDS.filter(f => P[f.key]).length;
+  const v = x => x == null ? "" : (Math.round(x * 100) / 100).toFixed(2);
+  const rows = STUB_FIELDS.map(f => {
+    const r = P[f.key];
+    return `<div class="rv${r ? "" : " off"}" data-rv="${f.key}">
+      <div class="rv-hd"><label><input type="checkbox" data-use="${f.key}" ${r ? "checked" : ""}><span>${f.label}</span></label>${r ? "" : `<span class="miss">not found</span>`}</div>
+      <div class="row2" style="margin-top:8px">
+        <label class="field" style="margin:0"><span class="lbl">This check</span><span class="inp has-pre"><span class="affix">$</span><input type="text" inputmode="decimal" data-sv="${f.key}:cur" value="${v(r && r.cur)}" placeholder="0.00"></span></label>
+        <label class="field" style="margin:0"><span class="lbl">Year to date</span><span class="inp has-pre"><span class="affix">$</span><input type="text" inputmode="decimal" data-sv="${f.key}:ytd" value="${v(r && r.ytd)}" placeholder="0.00"></span></label>
+      </div>
+      ${r ? `<div class="src">${r.lines.map(esc).join("<br>")}</div>` : ""}
+    </div>`;
+  }).join("");
+  const nextPay = P.payDate ? addDays(P.payDate, 14) : "";
+  const left = nextPay ? countPaychecks(nextPay, S.year) : null;
+  openSheet(`
+    ${SCAN.thumb ? `<img class="thumb" src="${SCAN.thumb}" alt="Paystub photo">` : ""}
+    <div class="${found >= 4 ? "banner ok" : "banner warn"}" style="margin-top:12px">${found} of ${STUB_FIELDS.length} lines found<span class="sm">${found >= 4 ? "Check each number against your stub, fix anything off, then apply." : "Fill in what's missing from your stub, or retake the photo flat, well lit and straight on."}</span></div>
+    ${rows}
+    <div class="rv">
+      <div class="rv-hd"><label><input type="checkbox" data-use="pay" ${P.payDate ? "checked" : ""}><span>Pay date → paychecks left</span></label>${P.payDate ? "" : `<span class="miss">not found</span>`}</div>
+      <label class="field"><span class="lbl">Pay date on this stub</span><input type="date" data-sv="pay:date" value="${P.payDate || ""}"></label>
+      <div class="note" id="payNote">${P.payDate ? `Next payday ${fmtDate(nextPay)} → ${left} paycheck${left === 1 ? "" : "s"} left in ${S.year}.` : "Enter the pay date to count paychecks left."}</div>
+    </div>
+    <p class="note">This check's amounts become your per-paycheck figures. If it included overtime, a bonus or an unusual deduction, change “This check” to a typical one.</p>
+    <div class="btns">
+      <button class="btn primary full" type="button" data-act="scanapply">Apply to W-2 income</button>
+      <label class="btn" for="stubFile" role="button">Retake photo</label>
+      <button class="btn" type="button" data-act="scanpaste">Edit text</button>
+    </div>
+    <details style="margin-top:14px"><summary class="note" style="cursor:pointer">Show recognized text (${P.lineCount} lines)</summary><pre class="raw">${esc(text)}</pre></details>`);
+}
+function applyScan(){
+  const body = $("scanBody"); let applied = 0;
+  const val = sel => { const el = body.querySelector(`[data-sv="${sel}"]`); return el ? el.value.trim() : ""; };
+  STUB_FIELDS.forEach(f => {
+    const use = body.querySelector(`[data-use="${f.key}"]`);
+    if (!use || !use.checked) return;
+    const c = val(f.key + ":cur"), y = val(f.key + ":ytd");
+    if (c !== ""){ S[f.cur] = String(n(c)); applied++; }
+    if (y !== ""){ S[f.ytd] = String(n(y)); applied++; }
+  });
+  const pu = body.querySelector(`[data-use="pay"]`), pd = val("pay:date");
+  let note = "";
+  if (pu && pu.checked && parseDate(pd)){
+    const next = addDays(pd, 14), left = countPaychecks(next, S.year);
+    S.w2_next_payday = next; S.w2_periods = String(left); note = ` · ${left} paychecks left`;
+  }
+  save(); buildInputs(); render(); closeSheet();
+  const card = $("card-w2"); if (card) card.open = true;
+  toast(`Updated ${applied} paystub number${applied === 1 ? "" : "s"}${note}`);
+}
+function toast(msg){
+  const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+$("stubFile").addEventListener("change", e => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (f) runOCR(f); });
+$("scanSheet").addEventListener("click", e => { if (e.target === $("scanSheet")) closeSheet(); });
+$("scanSheet").addEventListener("input", e => {
+  const sv = e.target.dataset && e.target.dataset.sv;
+  if (sv === "pay:date"){
+    const next = addDays(e.target.value, 14), left = next ? countPaychecks(next, S.year) : null, pn = $("payNote");
+    if (pn) pn.textContent = next ? `Next payday ${fmtDate(next)} → ${left} paycheck${left === 1 ? "" : "s"} left in ${S.year}.` : "Enter the pay date to count paychecks left.";
+  } else if (sv){
+    const k = sv.split(":")[0], cb = $("scanSheet").querySelector(`[data-use="${k}"]`);
+    if (cb && e.target.value.trim() !== ""){ cb.checked = true; cb.closest(".rv").classList.remove("off"); }
+  }
+});
+$("scanSheet").addEventListener("change", e => { const u = e.target.dataset && e.target.dataset.use; if (u) e.target.closest(".rv").classList.toggle("off", !e.target.checked); });
+
+/* ---------- events ---------- */
+function showTab(name){
+  document.querySelectorAll(".tab").forEach(t => { t.hidden = t.id !== "tab-" + name; });
+  document.querySelectorAll(".tabbar button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
+  window.scrollTo(0, 0);
+}
+function onField(e){
+  const el = e.target, k = el.dataset && el.dataset.k;
+  if (!k) return;
+  S[k] = el.type === "checkbox" ? el.checked : el.value;
+  if (k === "year"){ buildInputs(); }
+  save(); render();
+}
+document.addEventListener("input", onField);
+document.addEventListener("change", e => { if (e.target.type === "checkbox" || e.target.tagName === "SELECT" || e.target.type === "date") onField(e); });
+document.addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.tab) return showTab(b.dataset.tab);
+  if (b.dataset.go) return showTab(b.dataset.go);
+  const act = b.dataset.act;
+  if (act === "count"){
+    const c = countPaychecks(S.w2_next_payday, S.year);
+    if (c == null){ alert("Pick your next payday first."); return; }
+    S.w2_periods = String(c); $("w2_periods").value = c; save(); render();
+  } else if (act === "scanphoto"){
+    $("stubFile").click();
+  } else if (act === "scanpaste"){
+    openSheet(pasteHTML(SCAN.raw));
+  } else if (act === "scanread"){
+    const t = $("stubText"); if (t && t.value.trim()) { SCAN.thumb = ""; showReview(t.value); }
+  } else if (act === "scanapply"){
+    applyScan();
+  } else if (act === "scanclose"){
+    closeSheet();
+  } else if (act === "resetwi"){
+    S.wi_401k = 0; S.wi_biz_inc = 0; S.wi_biz_exp = 0;
+    ["wi_401k","wi_biz_inc","wi_biz_exp"].forEach(k => { $(k).value = 0; }); save(); render();
+  } else if (act === "export"){
+    const blob = new Blob([JSON.stringify({ app:"tax-xray", version:1, exported:new Date().toISOString(), data:S }, null, 2)], { type:"application/json" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `tax-xray-${S.year}-${todayStr()}.json`;
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  } else if (act === "import"){
+    $("importFile").click();
+  } else if (act === "reset"){
+    if (confirm("Erase every number in Tax X-Ray on this device? Export a backup first if you might want them.")){
+      S = Object.assign({}, DEFAULTS); try { localStorage.removeItem(KEY); } catch(err){}
+      buildInputs(); render(); showTab("inputs");
+    }
+  }
+});
+$("importFile").addEventListener("change", e => {
+  const f = e.target.files && e.target.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const o = JSON.parse(rd.result); const d = o && o.data ? o.data : o;
+      if (!d || typeof d !== "object" || Array.isArray(d)) throw new Error("bad");
+      const clean = {}; Object.keys(d).forEach(k => { if (/^[a-z0-9_]+$/.test(k) && ["string","number","boolean"].includes(typeof d[k])) clean[k] = d[k]; });
+      S = Object.assign({}, DEFAULTS, clean); if (!TAX_TABLES[S.year]) S.year = Object.keys(TAX_TABLES).slice(-1)[0];
+      save(); buildInputs(); render(); alert("Imported.");
+    } catch(err){ alert("That file isn't a Tax X-Ray export."); }
+    e.target.value = "";
+  };
+  rd.readAsText(f);
+});
+
+/* ---------- start ---------- */
+load(); buildInputs(); render();
+showTab(compute(S).hasData ? "summary" : "inputs");
+window.__taxxray = { compute, parseStub, TAX_TABLES };
+})();
+</script>
+</body>
+</html>
