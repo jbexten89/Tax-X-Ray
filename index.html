@@ -431,6 +431,8 @@ const CARDS = [
     {note:"Other pre-tax = health, dental, vision, FSA or HSA through payroll. These skip FICA and city tax too; traditional 401(k) only skips income tax."},
     {sub:"Withholding"},
     [["w2_fwh_ytd","Federal YTD","money"],["w2_fwh_check","Federal per check","money"]],
+    ["w2_fwh_extra","Extra federal per check (W-4 line 4c)","money"],
+    {note:"For extra withholding that starts with your next paycheck. If your stub's federal per check already includes it, leave this blank so it isn't counted twice."},
     [["w2_swh_ytd","Ohio YTD","money"],["w2_swh_check","Ohio per check","money"]],
     [["w2_lwh_ytd","Local YTD (city + school)","money"],["w2_lwh_check","Local per check","money"]]
   ]},
@@ -536,7 +538,8 @@ function compute(St, o){
   const medWages = Math.max(0, gross - pre);             // FICA / city wages (401k still included)
   const ssWages = Math.min(medWages, F.ssWageBase);
   // what-if: extra federal withholding per paycheck (W-4 line 4c) on the checks left this year
-  const fedWH = proj("w2_fwh_ytd","w2_fwh_check") + bon.f + wi.fw * Math.max(0, Math.floor(n(St.w2_periods)));
+  const fedWHextra = n(St.w2_fwh_extra) * P;   // W-4 line 4(c) extra on the paychecks left
+  const fedWH = proj("w2_fwh_ytd","w2_fwh_check") + fedWHextra + bon.f + wi.fw * P;
   const ohWH = proj("w2_swh_ytd","w2_swh_check") + bon.s;
   const locWH = proj("w2_lwh_ytd","w2_lwh_check") + bon.l;
 
@@ -644,7 +647,7 @@ function compute(St, o){
   const total = fedTotal + ohTax + localTax;
   const income = Math.max(0, gross + net + intDiv + oth);
   return {
-    P, gross, bonus: bon.g, bonusWH: bon.f + bon.s + bon.l, k401, pre, box1, medWages, fedWH, ohWH, locWH, addlWH,
+    P, gross, fedWHextra, bonus: bon.g, bonusWH: bon.f + bon.s + bon.l, k401, pre, box1, medWages, fedWH, ohWH, locWH, addlWH,
     rcpt, exp, expYtd, mileage, useCats, net, seBase, seSS, seMed, seTax, halfSE, addlMed,
     agi, magi, std, itemized, saltClaimed, saltCap, saltDed, charityItem, charityStd, useItem, deduction, otDed, carDed,
     tiPre, qbi, qbiDed, qbiNote, taxable, incTax, credit, fedIncTax, fedTotal, fedEst, fedPaid,
@@ -816,6 +819,7 @@ function render(){
   L.push(line(`SE tax <span class="muted">(SS ${money(r.seSS)} + Medicare ${money(r.seMed)})</span>`, money(r.seTax)));
   if (r.addlMed) L.push(line("Additional Medicare 0.9%", money(r.addlMed)));
   L.push(line("Total federal tax", money(r.fedTotal), "h"));
+  if (r.fedWHextra) L.push(line(`<span class="muted">Includes extra W-4 withholding</span>`, money(r.fedWHextra)));
   L.push(line(`<span class="muted">Paid: withholding ${money(r.fedWH)}${r.addlWH ? " + Medicare WH " + money(r.addlWH) : ""} + estimates ${money(r.fedEst)}</span>`, money(r.fedPaid)));
   L.push(line("Ohio AGI", money(r.agi), "h"));
   L.push(line(`− Exemptions (${r.persons} × ${money(r.exEach)})`, money(r.exTotal)));
