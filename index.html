@@ -349,6 +349,60 @@ const TAX_TABLES = {
       safeHarbor: { currentPct:.90, priorPct:1.00, minOwed:500 },
       estDue: ["2026-04-15","2026-06-15","2026-09-15","2027-01-15"]
     }
+  },
+  2027: {
+    label: "2027",
+    federal: {
+      // Ordinary income brackets: [upper limit of bracket, rate].
+      // Source: IRS Rev. Proc. 2026-35 §3.01 Tables 1–4 (IR-2026-133, released Nov 5, 2026).
+      brackets: {
+        single: [[12800,.10],[52025,.12],[109125,.22],[208325,.24],[264550,.32],[661375,.35],[Infinity,.37]],
+        mfj:    [[25600,.10],[104050,.12],[218250,.22],[416650,.24],[529100,.32],[793650,.35],[Infinity,.37]],
+        hoh:    [[18250,.10],[69650,.12],[109100,.22],[208300,.24],[264550,.32],[661350,.35],[Infinity,.37]],
+        mfs:    [[12800,.10],[52025,.12],[109125,.22],[208325,.24],[264550,.32],[396825,.35],[Infinity,.37]]
+      },
+      // Source: Rev. Proc. 2026-35 §3.15.
+      standardDeduction: { single:16600, mfj:33200, hoh:24925, mfs:16600 },
+      // Source: SSA 2027 wage base announcement (Oct 2026), via American Payroll Association / Journal of Accountancy.
+      ssWageBase: 192300,
+      // Statutory, not indexed (same as 2026).
+      ssRate: .124, medicareRate: .029, seFactor: .9235, seMinimum: 400,
+      addlMedicare: { rate:.009, threshold:{ single:200000, hoh:200000, mfj:250000, mfs:125000 }, employerThreshold:200000 },
+      // Source: Rev. Proc. 2026-35 §3.28 (threshold, phase-in range amount, $415 minimum deduction).
+      qbi: { rate:.20,
+             threshold:  { single:208300, hoh:208300, mfj:416600, mfs:208325 },
+             phaseInEnd: { single:283300, hoh:283300, mfj:566600, mfs:283325 },
+             minDeduction:415, minQbi:1000 },
+      // SALT cap: statute raises the 2026 figures by 1% a year for 2027–2029 → $40,804 cap, phase-out from $510,050
+      // (halved for MFS). Computed from IRC §164(b)(7) as amended by P.L. 119-21; not listed in Rev. Proc. 2026-35.
+      salt: { cap:40804, capMfs:20402, phaseoutStart:510050, phaseoutStartMfs:255025, phaseoutRate:.30, floor:10000, floorMfs:5000 },
+      // Child tax credit $2,300 (Rev. Proc. 2026-35 §3.05); phase-out thresholds statutory, not indexed.
+      childCredit: { perChild:2300, otherDependent:500, phaseoutStart:{ single:200000, hoh:200000, mfs:200000, mfj:400000 }, per1000:50 },
+      // OBBBA deductions — statutory, not indexed (same as 2026; overtime and car-loan interest run through 2028).
+      overtime: { cap:{ single:12500, hoh:12500, mfj:25000, mfs:0 }, phaseoutStart:{ single:150000, hoh:150000, mfj:300000, mfs:0 }, per1000:100 },
+      carLoanInterest: { cap:10000, phaseoutStart:{ single:100000, hoh:100000, mfs:100000, mfj:200000 }, per1000:200 },
+      charityNonItemizer: { single:1000, hoh:1000, mfs:1000, mfj:2000 }, charityFloorPct: .005,
+      // PLACEHOLDER: 2027 mileage rate not announced yet (IRS usually publishes in December).
+      // Carries the 76¢ rate in effect from Jul 1, 2026 — update when the IRS notice is out.
+      mileage: { h1:.76, h2:.76 },
+      // PROJECTED: 401(k) limit $25,500 and age-50 catch-up $8,500 per Milliman/Marsh forecasts (401k Specialist, Oct 20, 2026).
+      // IRS notice expected mid-November 2026 — update when published.
+      k401: { limit:25500, catchUp50:8500 },
+      safeHarbor: { currentPct:.90, priorPct:1.00, priorPctHigh:1.10, highAgi:150000, highAgiMfs:75000, minOwed:1000 },
+      // Form 1040-ES due dates for tax year 2027 (Jan 15, 2028 is a Saturday and Jan 17 is MLK Day → Jan 18).
+      estDue: ["2027-04-15","2027-06-15","2027-09-15","2028-01-18"]
+    },
+    ohio: {
+      // NOT YET PUBLISHED FOR 2027. HB 96 set the flat 2.75% rate for tax years 2026 and later with indexing
+      // suspended, so the 2026 figures are carried forward — confirm against Ohio's 2027 IT 1040ES/withholding tables.
+      zeroBracket: 26050, baseTax: 332, rate: .0275,
+      businessRate: .03, bid: { single:250000, hoh:250000, mfj:250000, mfs:125000 },
+      exemptionTiers: [[40000,2400],[80000,2150],[Infinity,1900]], exemptionMagiCutoff: 500000,
+      safeHarbor: { currentPct:.90, priorPct:1.00, minOwed:500 },
+      estDue: ["2027-04-15","2027-06-15","2027-09-15","2028-01-18"]
+    },
+    // Shown in the app while any 2027 figure is still a placeholder.
+    notice: "2027 Ohio rates, the 401(k) limit and the mileage rate aren't official yet — this year uses carried-over or projected values."
   }
 };
 
@@ -695,6 +749,7 @@ function render(){
   if (r.k401 - n(S.wi_401k) > kLimit) W.push(`<div class="banner warn">401(k) projection is over the limit<span class="sm">Projected ${money(r.k401 - n(S.wi_401k))} vs ${money(kLimit)} (${S.year} limit including age-50 catch-up). Check your per-check amount or paychecks left.</span></div>`);
   if (r.net < 0) W.push(`<div class="info">The business shows a ${money(-r.net)} loss. It offsets other income here; no SE tax or QBI deduction applies.</div>`);
   if (r.gross > 0 && !n(S.city_res) && !n(S.city_work) && !n(S.sd_rate)) W.push(`<div class="info">No city or school district rates entered yet — local tax shows $0. Add them under Inputs → Local taxes.</div>`);
+  if (T().notice) W.unshift(`<div class="info">${esc(T().notice)}</div>`);
   $("warnings").innerHTML = W.join("");
 
   // what-if
