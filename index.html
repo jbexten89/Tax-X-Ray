@@ -217,6 +217,11 @@ pre.raw{white-space:pre-wrap;word-break:break-word;font-size:12px;color:var(--mu
           <div class="hd"><span>Extra business expenses</span><b id="wiBEVal">$0</b></div>
           <input type="range" id="wi_biz_exp" data-k="wi_biz_exp" min="0" max="15000" step="250" value="0">
         </div>
+        <div class="slider">
+          <div class="hd"><span>Extra federal withholding per paycheck</span><b id="wiFWVal">$0</b></div>
+          <input type="range" id="wi_fwh" data-k="wi_fwh" min="0" max="500" step="5" value="0">
+          <div class="sub" id="wiFWHint"></div>
+        </div>
         <div class="wires">
           <div><div class="eyebrow">Total tax</div><div class="stat" id="wiTotal">$0</div><div class="sub" id="wiTotalD">no change</div></div>
           <div><div class="eyebrow" id="wiBalLbl">Refund / owe</div><div class="stat" id="wiBal">$0</div><div class="sub" id="wiBalD">no change</div></div>
@@ -410,7 +415,7 @@ const TAX_TABLES = {
 "use strict";
 const KEY = "taxxray.v1";
 const STATUSES = [["single","Single"],["mfj","Married filing jointly"],["hoh","Head of household"],["mfs","Married filing separately"]];
-const DEFAULTS = { year:"2026", status:"single", salt_auto:true, itemize:false, sd_base:"trad", wi_401k:0, wi_biz_inc:0, wi_biz_exp:0 };
+const DEFAULTS = { year:"2026", status:"single", salt_auto:true, itemize:false, sd_base:"trad", wi_401k:0, wi_biz_inc:0, wi_biz_exp:0, wi_fwh:0 };
 
 /* ---------- input cards (declarative) ---------- */
 const CARDS = [
@@ -516,7 +521,7 @@ function compute(St, o){
   o = o || {};
   const TT = TAX_TABLES[St.year] || TAX_TABLES[Object.keys(TAX_TABLES)[0]];
   const F = TT.federal, O = TT.ohio, st = St.status || "single", mfs = st === "mfs", mfj = st === "mfj";
-  const wi = o.whatIf ? { k:n(St.wi_401k), bi:n(St.wi_biz_inc), be:n(St.wi_biz_exp) } : { k:0, bi:0, be:0 };
+  const wi = o.whatIf ? { k:n(St.wi_401k), bi:n(St.wi_biz_inc), be:n(St.wi_biz_exp), fw:n(St.wi_fwh) } : { k:0, bi:0, be:0, fw:0 };
   const P = Math.max(0, Math.floor(n(St.w2_periods)));
   const proj = (a, b) => n(St[a]) + n(St[b]) * P;
 
@@ -529,7 +534,8 @@ function compute(St, o){
   const box1 = Math.max(0, gross - k401 - pre);          // federal & Ohio wages
   const medWages = Math.max(0, gross - pre);             // FICA / city wages (401k still included)
   const ssWages = Math.min(medWages, F.ssWageBase);
-  const fedWH = proj("w2_fwh_ytd","w2_fwh_check") + bon.f;
+  // what-if: extra federal withholding per paycheck (W-4 line 4c) on the checks left this year
+  const fedWH = proj("w2_fwh_ytd","w2_fwh_check") + bon.f + wi.fw * Math.max(0, Math.floor(n(St.w2_periods)));
   const ohWH = proj("w2_swh_ytd","w2_swh_check") + bon.s;
   const locWH = proj("w2_lwh_ytd","w2_lwh_check") + bon.l;
 
@@ -683,7 +689,7 @@ function buildInputs(){
   }).join("");
   $("year").innerHTML = Object.keys(TAX_TABLES).map(y => `<option value="${y}" ${S.year === y ? "selected" : ""}>${esc(TAX_TABLES[y].label || y)}</option>`).join("");
   $("status").innerHTML = STATUSES.map(([v,t]) => `<option value="${v}" ${S.status === v ? "selected" : ""}>${t}</option>`).join("");
-  ["wi_401k","wi_biz_inc","wi_biz_exp"].forEach(k => { $(k).value = n(S[k]); });
+  ["wi_401k","wi_biz_inc","wi_biz_exp","wi_fwh"].forEach(k => { $(k).value = n(S[k]); });
 }
 
 /* ---------- render ---------- */
@@ -761,6 +767,19 @@ function render(){
   $("wiKHint").textContent = `Room left: ${money(room)} (${money(F.k401.limit)} + ${money(F.k401.catchUp50)} catch-up at 50+). Spread over ${r.P || 0} paycheck${r.P === 1 ? "" : "s"}: ${r.P ? money(n(S.wi_401k) / r.P) + " each" : "—"}. Catch-up for higher earners may have to be Roth, which wouldn't cut tax.`;
   $("wiBIVal").textContent = money(n(S.wi_biz_inc));
   $("wiBEVal").textContent = money(n(S.wi_biz_exp));
+  // extra federal withholding: slider reaches a bit past what zeroes the federal balance
+  const fs = $("wi_fwh");
+  const rwNoFW = compute(Object.assign({}, S, { wi_fwh:0 }), { whatIf:true });
+  const zeroPer = r.P > 0 ? Math.max(0, -rwNoFW.fedBal) / r.P : 0;
+  const fMax = Math.max(500, Math.ceil(zeroPer * 1.25 / 50) * 50);
+  fs.max = fMax; fs.disabled = r.P === 0;
+  if (n(S.wi_fwh) > fMax){ S.wi_fwh = fMax; fs.value = fMax; }
+  $("wiFWVal").textContent = money(n(S.wi_fwh));
+  $("wiFWHint").textContent = r.P === 0
+    ? "Enter paychecks left this year (Inputs → W-2 income) to use this."
+    : `${money(n(S.wi_fwh))} × ${r.P} paycheck${r.P === 1 ? "" : "s"} = ${money(n(S.wi_fwh) * r.P)} more withheld. ` +
+      (zeroPer > 0 ? `About ${money(Math.ceil(zeroPer))} per check brings federal to $0 owed. Set it on your W-4, line 4(c).` : "Federal is already covered — no extra needed.") +
+      " Doesn't change your tax, only what's left to pay at filing.";
   $("wiTotal").textContent = money0(rw.total);
   const dT = rw.total - r.total;
   $("wiTotalD").innerHTML = dT === 0 || Math.round(dT) === 0 ? "no change" : `<span class="${dT < 0 ? "mint" : "amber"}">${signed(dT)}</span> vs now`;
@@ -1514,8 +1533,8 @@ document.addEventListener("click", e => {
   } else if (act === "scanclose"){
     closeSheet();
   } else if (act === "resetwi"){
-    S.wi_401k = 0; S.wi_biz_inc = 0; S.wi_biz_exp = 0;
-    ["wi_401k","wi_biz_inc","wi_biz_exp"].forEach(k => { $(k).value = 0; }); save(); render();
+    S.wi_401k = 0; S.wi_biz_inc = 0; S.wi_biz_exp = 0; S.wi_fwh = 0;
+    ["wi_401k","wi_biz_inc","wi_biz_exp","wi_fwh"].forEach(k => { $(k).value = 0; }); save(); render();
   } else if (act === "export"){
     const blob = new Blob([JSON.stringify({ app:"tax-xray", version:1, exported:new Date().toISOString(), data:S }, null, 2)], { type:"application/json" });
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `tax-xray-${S.year}-${todayStr()}.json`;
