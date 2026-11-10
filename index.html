@@ -104,6 +104,20 @@ input[type=checkbox][role=switch]:checked::after{transform:translateX(20px)}
 .btn{min-height:48px;border-radius:12px;border:1px solid var(--border2);background:var(--panel2);color:var(--text);font:inherit;font-weight:700;font-size:15px;padding:0 16px;cursor:pointer;white-space:nowrap}
 label.btn{display:inline-flex;align-items:center;justify-content:center;-webkit-user-select:none;user-select:none}
 .card.gate-off .gate{display:none}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--field);border:1px solid var(--border);border-radius:12px;padding:4px;margin:12px 0 4px}
+.seg button{min-height:42px;border:none;border-radius:9px;background:none;color:var(--muted);font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.seg button[aria-checked=true]{background:var(--panel2);color:var(--mint);box-shadow:inset 0 0 0 1px var(--border2)}
+.form{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:16px;margin:12px 0}
+.form .fh{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.form .fn{font-weight:700;font-size:17px}
+.form .ft{font-size:12px;color:var(--muted)}
+.box{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin:10px 0}
+.box .k{font-size:13px;color:var(--muted);font-weight:600}
+.box .k b{display:block;color:var(--text);font-size:15px;margin-bottom:2px}
+.box .v{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.box.hl{border-color:rgba(60,199,154,.45);background:var(--mint-soft)}
+.alt{font-size:14px;color:var(--muted);margin:8px 0 0;line-height:1.45}
+.alt b{color:var(--text);font-weight:600}
 .vh{position:absolute!important;width:1px;height:1px;opacity:0;overflow:hidden;clip:rect(0 0 0 0);pointer-events:none}
 .errd{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--muted);background:var(--field);border:1px solid var(--border);border-radius:10px;padding:8px 10px;margin:8px 0;word-break:break-word}
 .btn.primary{background:var(--mint);border-color:var(--mint);color:#06110C}
@@ -256,6 +270,28 @@ pre.raw{white-space:pre-wrap;word-break:break-word;font-size:12px;color:var(--mu
     <div id="planBody"></div>
   </section>
 
+  <!-- ============ W-4 / IT-4 RECOMMENDATIONS ============ -->
+  <section class="tab" id="tab-w4" role="tabpanel" hidden>
+    <div class="panel">
+      <div class="eyebrow">What do you want at filing?</div>
+      <p class="note" style="margin-top:6px">Like the IRS withholding estimator: pick the refund you want, and this tells you what to put on your forms so your remaining paychecks get you there.</p>
+      <div class="seg" role="radiogroup" aria-label="Target">
+        <button type="button" data-tgt="zero">Owe $0</button>
+        <button type="button" data-tgt="small">Small refund</button>
+        <button type="button" data-tgt="custom">Custom</button>
+      </div>
+      <div id="tgtCustom">
+        <div class="row2">
+          <label class="field"><span class="lbl">Federal refund</span><span class="inp has-pre"><span class="affix">$</span><input type="text" inputmode="decimal" autocomplete="off" id="tgt_fed" data-k="tgt_fed" placeholder="0"></span></label>
+          <label class="field"><span class="lbl">Ohio refund</span><span class="inp has-pre"><span class="affix">$</span><input type="text" inputmode="decimal" autocomplete="off" id="tgt_oh" data-k="tgt_oh" placeholder="0"></span></label>
+        </div>
+        <label class="field"><span class="lbl">Local refund (city + school)</span><span class="inp has-pre"><span class="affix">$</span><input type="text" inputmode="decimal" autocomplete="off" id="tgt_loc" data-k="tgt_loc" placeholder="0"></span></label>
+      </div>
+      <label class="field"><span class="lbl">Exemptions on your Ohio IT-4 now (optional)</span><input type="text" inputmode="numeric" autocomplete="off" id="it4_ex" data-k="it4_ex" placeholder="From your paystub, e.g. 2"></label>
+    </div>
+    <div id="w4Body"></div>
+  </section>
+
   <!-- ============ PAYSTUB SCAN SHEET ============ -->
   <div class="sheet" id="scanSheet" hidden role="dialog" aria-modal="true" aria-labelledby="scanTitle">
     <div class="sheet-in">
@@ -279,6 +315,8 @@ pre.raw{white-space:pre-wrap;word-break:break-word;font-size:12px;color:var(--mu
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Inputs</button>
     <button type="button" role="tab" data-tab="plan" aria-selected="false">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Planner</button>
+    <button type="button" role="tab" data-tab="w4" aria-selected="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 15l2 2 4-4"/></svg>W-4</button>
   </div>
 </nav>
 
@@ -416,7 +454,7 @@ const TAX_TABLES = {
 "use strict";
 const KEY = "taxxray.v1";
 const STATUSES = [["single","Single"],["mfj","Married filing jointly"],["hoh","Head of household"],["mfs","Married filing separately"]];
-const DEFAULTS = { year:"2026", status:"single", salt_auto:true, itemize:false, sd_base:"trad", wi_401k:0, wi_biz_inc:0, wi_biz_exp:0, wi_fwh:0 };
+const DEFAULTS = { year:"2026", status:"single", salt_auto:true, itemize:false, sd_base:"trad", wi_401k:0, wi_biz_inc:0, wi_biz_exp:0, wi_fwh:0, tgt_mode:"zero" };
 
 /* ---------- input cards (declarative) ---------- */
 const CARDS = [
@@ -694,6 +732,7 @@ function buildInputs(){
   $("year").innerHTML = Object.keys(TAX_TABLES).map(y => `<option value="${y}" ${S.year === y ? "selected" : ""}>${esc(TAX_TABLES[y].label || y)}</option>`).join("");
   $("status").innerHTML = STATUSES.map(([v,t]) => `<option value="${v}" ${S.status === v ? "selected" : ""}>${t}</option>`).join("");
   ["wi_401k","wi_biz_inc","wi_biz_exp","wi_fwh"].forEach(k => { $(k).value = n(S[k]); });
+  ["tgt_fed","tgt_oh","tgt_loc","it4_ex"].forEach(k => { $(k).value = S[k] == null ? "" : S[k]; });
 }
 
 /* ---------- render ---------- */
@@ -835,6 +874,7 @@ function render(){
   $("lines").innerHTML = L.join("");
 
   renderPlanner(r);
+  renderW4(r);
 }
 
 function quarterRows(due, paidKeys, perQ, today){
@@ -847,6 +887,104 @@ function quarterRows(due, paidKeys, perQ, today){
     const sug = past ? "—" : (perQ > 0 ? money(perQ) : "$0");
     return `<tr class="${cls}"><td class="due">Q${i+1}<small>${fmtDate(d)}${cls === "next" ? " · next" : ""}</small></td><td>${paid ? money(paid) : "—"}</td><td>${sug}</td></tr>`;
   }).join("");
+}
+
+/* =====================================================================
+   W-4 / IT-4 recommendations — works like the IRS Tax Withholding
+   Estimator: target a refund, solve for the per-paycheck change.
+   ===================================================================== */
+const TGT_PRESETS = { zero:{ fed:0, oh:0, loc:0 }, small:{ fed:500, oh:100, loc:50 } };
+function targets(){
+  if (S.tgt_mode === "custom") return { fed:n(S.tgt_fed), oh:n(S.tgt_oh), loc:n(S.tgt_loc) };
+  return TGT_PRESETS[S.tgt_mode] || TGT_PRESETS.zero;
+}
+function perCheck(amount, P){ return P > 0 ? Math.ceil(Math.abs(amount) / P) : 0; }
+function boxHTML(title, sub, value, hl){ return `<div class="box${hl ? " hl" : ""}"><div class="k"><b>${title}</b>${sub}</div><div class="v${hl ? " mint" : ""}">${value}</div></div>`; }
+function renderW4(r){
+  document.querySelectorAll("[data-tgt]").forEach(b => b.setAttribute("aria-checked", String(b.dataset.tgt === (S.tgt_mode || "zero"))));
+  $("tgtCustom").hidden = S.tgt_mode !== "custom";
+  if (!r.hasData){ $("w4Body").innerHTML = `<div class="panel"><p class="muted" style="margin:0">Add your paystub numbers under Inputs first.</p></div>`; return; }
+  const TT = T(), F = TT.federal, st = S.status, P = r.P, tg = targets(), yr = S.year;
+  const noChecks = P === 0;
+  const tgtTxt = v => v > 0 ? `a ${money(v)} refund` : "owing $0";
+  const out = [];
+
+  // ---------------- Federal W-4 ----------------
+  const fGap = r.fedTotal + tg.fed - r.fedPaid;              // + = need more withheld
+  const cur4c = n(S.w2_fwh_extra);
+  // penalty-only minimum (same safe-harbor test as the Planner)
+  const sh = F.safeHarbor, priorSet = S.prior_fed !== "" && S.prior_fed != null;
+  const high = n(S.prior_agi) > (st === "mfs" ? sh.highAgiMfs : sh.highAgi);
+  const fReq = Math.min(sh.currentPct * r.fedTotal, priorSet ? n(S.prior_fed) * (high ? sh.priorPctHigh : sh.priorPct) : Infinity);
+  const fShort = Math.max(0, fReq - r.fedPaid);
+  let fed;
+  if (noChecks){
+    fed = fGap > 0.5 ? boxHTML("Estimated payment", `No paychecks left in ${yr} — pay by ${fmtDate(F.estDue[3])}`, money(Math.ceil(fGap)), true)
+                     : boxHTML("No change needed", `You're on track for ${tgtTxt(tg.fed)} or better`, "✓", true);
+  } else if (fGap > 0.5){
+    const add = perCheck(fGap, P);
+    fed = boxHTML("Step 4(c) Extra withholding", cur4c ? `Change ${money(cur4c)} → this, per paycheck` : "Enter this, per paycheck", money(cur4c + add), true) +
+      `<p class="alt">That's <b>${money(add)} more</b> on each of your ${P} remaining paychecks, for ${tgtTxt(tg.fed)} at filing.` +
+      (fShort > 0.5 && perCheck(fShort, P) < add ? ` Bare minimum to avoid an underpayment penalty: <b>${money(cur4c + perCheck(fShort, P))}</b> per check.` : "") + `</p>`;
+  } else {
+    const over = -fGap, cut = perCheck(over, P);
+    fed = cur4c > 0
+      ? boxHTML("Step 4(c) Extra withholding", `Lower ${money(cur4c)} → this, per paycheck`, money(Math.max(0, cur4c - cut)), true) +
+        `<p class="alt">You're on pace for about ${money(over)} more than your target.</p>`
+      : boxHTML("No change needed", `On pace for ${money(over)} more than ${tgtTxt(tg.fed)}`, "✓", true) +
+        `<p class="alt">That's roughly <b>${money(cut)} per paycheck</b> you could keep instead. To trim withholding, enter deductions in Step 4(b) — or leave it and enjoy the bigger refund.</p>`;
+  }
+  out.push(`<div class="form"><div class="fh"><span class="fn">Federal W-4</span><span class="ft">give to payroll</span></div>
+    <p class="alt" style="margin-top:4px">Projected federal tax ${money(r.fedTotal)} · on pace to have paid ${money(r.fedPaid)}</p>
+    ${fed}
+    <p class="alt">Leave Steps 2–4(b) as they are. Step 4(c) is the simplest fix and it also covers the self-employment tax on your photography profit, which the W-4's other steps don't.${noChecks ? "" : ` A 4(c) amount carries into ${+yr + 1} — revisit it in January (switch the tax year and set paychecks left to 26).`}</p>
+  </div>`);
+
+  // ---------------- Ohio IT-4 ----------------
+  const oGap = r.ohTax + tg.oh - r.ohPaid;
+  let oh;
+  if (noChecks){
+    oh = oGap > 0.5 ? boxHTML("Ohio estimated payment", `IT 1040ES by ${fmtDate(TT.ohio.estDue[3])}`, money(Math.ceil(oGap)), true)
+                    : boxHTML("No change needed", `On track for ${tgtTxt(tg.oh)} or better`, "✓", true);
+  } else if (oGap > 0.5){
+    oh = boxHTML("Additional Ohio withholding", "per pay period", money(perCheck(oGap, P)), true) +
+         `<p class="alt">Adds ${money(perCheck(oGap, P) * P)} over ${P} paychecks for ${tgtTxt(tg.oh)} at filing.</p>`;
+  } else {
+    oh = boxHTML("Additional Ohio withholding", `On pace for ${money(-oGap)} more than ${tgtTxt(tg.oh)}`, "$0", true);
+  }
+  const ex = S.it4_ex === "" || S.it4_ex == null ? null : Math.max(0, Math.floor(n(S.it4_ex)));
+  let exLine = `Exemptions: <b>${r.persons}</b> (you${st === "mfj" ? ", your spouse" : ""}${r.persons > (st === "mfj" ? 2 : 1) ? " and your dependents" : ""}).`;
+  if (ex != null && ex > r.persons) exLine += ` You claim ${ex} now — lowering it to ${r.persons} matches your return and withholds a little more.`;
+  else if (ex != null && ex < r.persons) exLine += ` You claim ${ex} now — raising it to ${r.persons} would withhold a little less.`;
+  else if (ex != null) exLine += ` That matches what you claim now.`;
+  out.push(`<div class="form"><div class="fh"><span class="fn">Ohio IT-4</span><span class="ft">give to payroll</span></div>
+    <p class="alt" style="margin-top:4px">Projected Ohio tax ${money(r.ohTax)} · on pace to have paid ${money(r.ohPaid)}</p>
+    ${oh}
+    <p class="alt">${exLine} Each exemption only shifts withholding slightly; the per-pay amount does the real work.</p>
+  </div>`);
+
+  // ---------------- Local: city + school district ----------------
+  const lGap = r.localTax + tg.loc - r.localPaid;
+  const hasSD = n(S.sd_rate) > 0, hasCity = n(S.city_res) > 0 || n(S.city_work) > 0;
+  let loc;
+  if (!hasSD && !hasCity){
+    loc = `<p class="alt">No city or school district rates entered yet (Inputs → Local taxes), so there's nothing to check.</p>`;
+  } else if (lGap > 0.5){
+    const bizPart = Math.max(0, r.net) > 0;
+    loc = boxHTML("Local shortfall", `School ${money(r.sdTax)} + city ${money(r.cityTax)} tax vs ${money(r.localPaid)} paid`, money(Math.ceil(lGap)), true) +
+      `<p class="alt"><b>Through payroll:</b> about ${noChecks ? "—" : money(perCheck(lGap, P)) + " extra per paycheck"}. ${hasSD ? "School district tax is withheld for the district number on your IT-4 — confirm it's listed. " : ""}Not every employer will withhold extra local tax, so ask.</p>
+       <p class="alt"><b>Or pay it directly:</b> ${hasSD ? `school district via Ohio <b>SD 100ES</b> estimates${bizPart ? " (your photography profit is what usually leaves this short)" : ""}` : ""}${hasSD && hasCity ? "; " : ""}${hasCity ? "city through your city tax office's quarterly declaration" : ""}.</p>`;
+  } else {
+    loc = boxHTML("No change needed", `On pace for ${money(-lGap)} more than ${tgtTxt(tg.loc)}`, "✓", true) +
+      (hasSD ? `<p class="alt">Make sure your school district number is on your IT-4 so payroll keeps withholding it.</p>` : "");
+  }
+  out.push(`<div class="form"><div class="fh"><span class="fn">City &amp; school district</span><span class="ft">payroll or direct</span></div>
+    <p class="alt" style="margin-top:4px">Projected local tax ${money(r.localTax)} · on pace to have paid ${money(r.localPaid)}</p>
+    ${loc}
+  </div>`);
+
+  out.push(`<p class="note">Based on everything in Inputs, including any upcoming bonus and estimated payments already made. After the change shows on a paystub, scan or enter that stub so the numbers start from it.</p>`);
+  $("w4Body").innerHTML = out.join("");
 }
 
 function renderPlanner(r){
@@ -1513,6 +1651,7 @@ document.addEventListener("change", e => { if (e.target.type === "checkbox" || e
 document.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
   if (b.dataset.tab) return showTab(b.dataset.tab);
+  if (b.dataset.tgt){ S.tgt_mode = b.dataset.tgt; save(); render(); return; }
   if (b.dataset.go) return showTab(b.dataset.go);
   const act = b.dataset.act;
   if (act === "count"){
